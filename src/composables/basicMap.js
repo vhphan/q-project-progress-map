@@ -14,7 +14,7 @@ import 'leaflet-draw';
 import {loadCss, loadScript} from "@/utils/myFunctions";
 
 import {useApi} from "../plugins/http";
-import {cellNameColumn, clusterIdColumn, siteNameColumn} from "@/settings/constants";
+import {cellNameColumn, clusterIdColumn, districtIdColumn, siteNameColumn} from "@/settings/constants";
 // import {clusterIdColumn} from "../settings/constants";
 
 let siteMarker;
@@ -400,7 +400,22 @@ function makeSiteLayers({
                 //         fillColor: polygonLayer.color
                 //     });
                 // })
-                layer.bindTooltip(feature.properties[clusterIdColumn]);
+                // if (clusterIdColumn in feature.properties) {
+                //     layer.bindPopup(feature.properties[clusterIdColumn]);
+                // }
+                // if (districtIdColumn in feature.properties) {
+                //     layer.bindPopup(feature.properties[districtIdColumn]);
+                // }
+
+                let html = '';
+                for (const [key, value] of Object.entries(feature.properties)) {
+                    console.log(key, value);
+                    if (value) {
+                        html += `<b>${key}</b>: ${value}<br>`;
+                    }
+                }
+                layer.bindPopup(html);
+
             },
             style: function (feature) {
                 return {

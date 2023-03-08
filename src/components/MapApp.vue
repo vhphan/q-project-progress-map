@@ -86,11 +86,19 @@ export default {
         label: 'clusters',
         url: `${BASE_URL_NODE}/polygons?file=clusters&api=${apiKey}`,
         ...clusterPolygonStyle
+        },
+        {
+          label: 'districts',
+          url: `${BASE_URL_NODE}/polygons?file=districts&api=${apiKey}`,
+          color: '#06c506',
+          weight: 1.5,
+          fillOpacity: 0,
+          fillColor: '#d1d1f5'
         }
       ];
 
       const clusterClickCallBack = function (e) {
-        //   console.log(e);
+          // console.log(e);
         //   e.target.feature.properties[clusterIdColumn] && (selectedCluster.value = e.target.feature.properties[clusterIdColumn]);
       };
 

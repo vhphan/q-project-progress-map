@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 import {useStorage} from "@vueuse/core";
-import {techLayers} from "@/settings/constants.js";
+import {regions, techLayers} from "@/settings/constants.js";
 
 export const useMapStore = defineStore('map', {
     state: () => {
@@ -27,7 +27,7 @@ export const useMapStore = defineStore('map', {
             lastCenter: useStorage('lastCenter', [3.153223, 101.7002]),
             lastZoom: useStorage('lastZoom', null),
             defaultZoom: 8,
-            regions: ['CENTRAL', 'EASTERN', 'SABAH', 'SARAWAK', 'SOUTHERN'],
+            regions,
             techLayers: techLayers,
             techLayersAdded: Object.fromEntries(techLayers.map((techLayer) => [techLayer, false])),
             techLayersColors: [

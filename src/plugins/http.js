@@ -57,9 +57,10 @@ const addInterceptor = (instance) => {
 
     instance.interceptors.response.use(function (response) {
         if (!response.data.success) {
-            triggerInfo(
-                {message: 'Success indicator is false or missing.'}
-            );
+            // triggerInfo(
+            //     {message: 'Success indicator is false or missing.'}
+            // );
+            colorTrace(`Success indicator is false or missing. ${response.config.url}`, 'red');
         }
         return response;
     }, function (error) {
