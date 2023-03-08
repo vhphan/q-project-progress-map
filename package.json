@@ -1,0 +1,40 @@
+{
+  "name": "celcom-capacity-dashboard",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.15.11",
+    "axios": "^1.3.3",
+    "chroma-js": "^2.4.2",
+    "echarts": "^5.4.1",
+    "pinia": "^2.0.31",
+    "quasar": "^2.11.6",
+    "random-material-color": "^1.0.5",
+    "tabulator-tables": "^5.4.4",
+    "vue": "^3.2.25",
+    "vue-echarts": "^6.5.4",
+    "vue-router": "^4.1.6",
+    "@vueuse/core": "^9.6.0",
+    "leaflet": "^1.8.0",
+    "leaflet-ajax": "^2.1.0",
+    "leaflet-draw": "^1.0.4",
+    "leaflet-easybutton": "^2.4.0",
+    "leaflet-geosearch": "^3.6.0",
+    "leaflet-ruler": "github:gokertanrisever/leaflet-ruler",
+    "leaflet-search": "^2.9.9",
+    "leaflet.control.layers.tree": "^1.0.2",
+    "leaflet.gridlayer.googlemutant": "^0.12.0"
+  },
+  "devDependencies": {
+    "@quasar/vite-plugin": "^1.0.4",
+    "@vitejs/plugin-vue": "^2.0.0",
+    "sass": "1.32.0",
+    "vite": "^2.7.2"
+  }
+}
