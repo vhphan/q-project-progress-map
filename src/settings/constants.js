@@ -1,7 +1,7 @@
 export const operator = 'dnb';
 export const techLayers = ['N3', 'L7'];
-export const basePath = '/apps/project-progress-map/';
-export const authLoginUrl = 'https://cmeportal.eprojecttrackers.com/index.php?action=celcomCapacityDashboard';
+export const basePath = '/app/project-progress-map/';
+export const authLoginUrl = 'https://ndoportal.eprojecttrackers.com/index.php?action=projectProgressMap';
 export const regions = ['CENTRAL', 'EASTERN', 'SABAH', 'SARAWAK', 'SOUTHERN'];
 
 export const cellNameColumn = 'Cell Name';
