@@ -74,6 +74,7 @@ export const useMapStore = defineStore('map', {
                 },
             ],
             redrawKpiLayer: false,
+            mapTitle: '',
         }
     },
     getters: {

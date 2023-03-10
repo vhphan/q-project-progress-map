@@ -42,13 +42,13 @@
               outlined
               class="col-12"
           />
-          <q-toggle v-model="reverseColorMap" label="Reverse Color Scheme" class="col-6"/>
-
+          <q-toggle v-model="reverseColorMap" label="Reverse Color Scheme" class="col-4"/>
+          <q-space/>
           <q-btn
               glossy
               label="Apply/Redraw"
               @click="()=>redraw()"
-              class="col-5 q-mt-xs q-mx-xs bg-blue-2"
+              class="col-6 q-mt-xs q-mx-xs bg-blue-2"
               :loading="redrawKpiLayer">
             <template v-slot:loading>
               <q-spinner-clock

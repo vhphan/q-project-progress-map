@@ -13,6 +13,10 @@
           </q-avatar>
           Project Dashboard
         </q-toolbar-title>
+        <q-space/>
+        <span class="text-h5 text-bold" style="text-decoration: underline;">{{mapTitle}}</span>
+        <q-space/>
+
         <q-tabs align="left">
           <q-route-tab :to="`${basePath}page1`" label="Page One"/>
 <!--          <q-route-tab :to="`${basePath}page2`" label="Page Two"/>-->
@@ -41,6 +45,8 @@ import {basePath} from "../settings/constants.js";
 import {computed, ref} from "vue";
 import {useRoute} from "vue-router";
 import MapSideBar from "@/components/MapSideBar.vue";
+import {storeToRefs} from "pinia";
+import {useMapStore} from "@/store/mapStore.js";
 
 
 const leftDrawerOpen = ref(true);
@@ -51,5 +57,5 @@ const toggleLeftDrawer = function () {
 
 const route = useRoute();
 const currentRouteName = computed(() => route.name)
-
+const {mapTitle} = storeToRefs(useMapStore());
 </script>

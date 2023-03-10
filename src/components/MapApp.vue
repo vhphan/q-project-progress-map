@@ -22,7 +22,7 @@ import {useMainStore} from "@/store/mainStore";
 import {storeToRefs} from "pinia";
 import {addSearch, addSizeSelector, loadBasicMap, makeSiteLayers} from "@/composables/basicMap";
 import {debounce} from "quasar";
-import {getCookie, loadScript} from "@/utils/myFunctions";
+import {getCookie, loadScript, titleCase} from "@/utils/myFunctions";
 import {NODE_URL} from "@/plugins/http";
 import {BASE_URL_NODE} from "@/plugins/http";
 import {useProgressDataStore} from "@/store/progressDataStore.js";
@@ -213,7 +213,7 @@ export default {
 
     const progressDataStore = useProgressDataStore();
     const {progressData, selectedKpi, selectedTypeOfKpi} = storeToRefs(progressDataStore);
-    const {redrawKpiLayer} = storeToRefs(mapStore);
+    const {redrawKpiLayer, mapTitle} = storeToRefs(mapStore);
     const cosmeticStore = useCosmeticStore();
 
 
@@ -228,6 +228,16 @@ export default {
       return '#ffffff';
     };
 
+    const getAdditionalPopUp = (polygonId) => {
+      const polygonIdKey = selectedTypeOfKpi.value === 'cluster' ? 'Cluster' : 'District';
+      const data = selectedTypeOfKpi.value === 'cluster' ? progressData.value.clusterData : progressData.value.districtData;
+      const polygonData = data.find((row) => row[polygonIdKey] === polygonId);
+      if (polygonData) {
+        return `<b>${selectedKpi.value[selectedTypeOfKpi.value]}</b>: ${polygonData[selectedKpi.value[selectedTypeOfKpi.value]]}<br>`;
+      }
+      return '';
+    };
+
     watch(redrawKpiLayer, (newValue) => {
       if (newValue) {
         // mapObj.layerGroups['progress']
@@ -235,6 +245,14 @@ export default {
         const polygonIdColumn = selectedTypeOfKpi.value === 'cluster' ? clusterIdColumn: districtIdColumn;
         mapObj.layerGroups[selectedTypeOfKpi.value].eachLayer((layer) => {
 
+          let html = '';
+          for (const [key, value] of Object.entries(layer.feature.properties)) {
+            if (value) {
+              html += `<b>${key}</b>: ${value}<br>`;
+            }
+          }
+          html += getAdditionalPopUp(layer.feature.properties[polygonIdColumn]);
+          layer.bindPopup(html);
 
           layer.setStyle({
             fillColor: getColor(layer.feature.properties[polygonIdColumn]),
@@ -242,6 +260,7 @@ export default {
             fillOpacity: 0.5,
           });
         });
+        mapTitle.value = `${titleCase(selectedTypeOfKpi.value)}: ${titleCase(selectedKpi.value[selectedTypeOfKpi.value])}`;
         redrawKpiLayer.value = false;
       }
     });
@@ -250,7 +269,7 @@ export default {
       mapObjReactive,
       mapResize,
       makeMap,
-
+      mapTitle,
     };
   }
 };
