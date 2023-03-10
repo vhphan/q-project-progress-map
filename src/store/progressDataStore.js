@@ -25,7 +25,7 @@ export const useProgressDataStore = defineStore({
             {label: 'District', value: 'district'},
             {label: 'Cluster', value: 'cluster'},
         ],
-
+        selectedDataFile: useStorage('selectedDataFile', null),
     }),
     getters: {
       dataLoaded: (state) => {
@@ -39,8 +39,8 @@ export const useProgressDataStore = defineStore({
       }
     },
     actions: {
-        async queryProgressData(selectedDataFile) {
-            this.progressData = await apiGetProgressData({selectedDataFile});
+        async queryProgressData() {
+            this.progressData = await apiGetProgressData({selectedDataFile: this.selectedDataFile});
         }
     }
 });

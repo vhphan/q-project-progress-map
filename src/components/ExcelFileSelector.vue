@@ -202,10 +202,10 @@ export default {
       selectedFile.value = file[0];
     };
 
-    const selectedDataFile = ref(null);
+    const {selectedDataFile} = storeToRefs(progressDataStore);
 
     const downloadData = () => {
-      progressDataStore.queryProgressData(selectedDataFile.value);
+      progressDataStore.queryProgressData();
     };
 
     const dataFileNameLoaded = computed(() => {

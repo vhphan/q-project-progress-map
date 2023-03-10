@@ -21,7 +21,7 @@ import {clusterIdColumn, districtIdColumn, operator} from "@/settings/constants"
 import {useMainStore} from "@/store/mainStore";
 import {storeToRefs} from "pinia";
 import {addSearch, addSizeSelector, loadBasicMap, makeSiteLayers} from "@/composables/basicMap";
-import {debounce} from "quasar";
+import {debounce, useQuasar} from "quasar";
 import {getCookie, loadScript, titleCase} from "@/utils/myFunctions";
 import {NODE_URL} from "@/plugins/http";
 import {BASE_URL_NODE} from "@/plugins/http";
@@ -238,31 +238,43 @@ export default {
       return '';
     };
 
-    watch(redrawKpiLayer, (newValue) => {
-      if (newValue) {
-        // mapObj.layerGroups['progress']
-        console.log(mapObj.layerGroups[selectedTypeOfKpi.value]);
-        const polygonIdColumn = selectedTypeOfKpi.value === 'cluster' ? clusterIdColumn: districtIdColumn;
-        mapObj.layerGroups[selectedTypeOfKpi.value].eachLayer((layer) => {
+    const {dataLoaded} = storeToRefs(progressDataStore);
+    // const $q = useQuasar();
+    watch(redrawKpiLayer, async (newValue) => {
 
-          let html = '';
-          for (const [key, value] of Object.entries(layer.feature.properties)) {
-            if (value) {
-              html += `<b>${key}</b>: ${value}<br>`;
-            }
-          }
-          html += getAdditionalPopUp(layer.feature.properties[polygonIdColumn]);
-          layer.bindPopup(html);
-
-          layer.setStyle({
-            fillColor: getColor(layer.feature.properties[polygonIdColumn]),
-            weight: 0.5,
-            fillOpacity: 0.5,
-          });
-        });
-        mapTitle.value = `${titleCase(selectedTypeOfKpi.value)}: ${titleCase(selectedKpi.value[selectedTypeOfKpi.value])}`;
-        redrawKpiLayer.value = false;
+      if (!newValue) {
+        return;
       }
+      if (!dataLoaded.value) {
+        // $q.loading.show({
+        //   message: 'Fetching data from server. Hang on...'
+        // });
+        await progressDataStore.queryProgressData();
+        // $q.loading.hide();
+      }
+      console.log(mapObj.layerGroups[selectedTypeOfKpi.value]);
+      const polygonIdColumn = selectedTypeOfKpi.value === 'cluster' ? clusterIdColumn : districtIdColumn;
+      mapObj.layerGroups[selectedTypeOfKpi.value].eachLayer((layer) => {
+
+        let html = '';
+        for (const [key, value] of Object.entries(layer.feature.properties)) {
+          if (value) {
+            html += `<b>${key}</b>: ${value}<br>`;
+          }
+        }
+        let additionalPopUp = getAdditionalPopUp(layer.feature.properties[polygonIdColumn]);
+        html += additionalPopUp;
+        layer.bindPopup(html);
+        layer.bindTooltip(additionalPopUp);
+
+        layer.setStyle({
+          fillColor: getColor(layer.feature.properties[polygonIdColumn]),
+          weight: 0.5,
+          fillOpacity: 0.5,
+        });
+      });
+      mapTitle.value = `${titleCase(selectedTypeOfKpi.value)}: ${titleCase(selectedKpi.value[selectedTypeOfKpi.value])}`;
+      redrawKpiLayer.value = false;
     });
 
     return {
