@@ -15,7 +15,7 @@ export const useMapStore = defineStore('map', {
             chloroplethData: null,
             rankingData: null,
             pointsData: null,
-            region: 'CENTRAL',
+            region: useStorage('CENTRAL', 'CENTRAL'),
             centers: {
                 'CENTRAL': [3.153223, 101.7002],
                 'EASTERN': [4.9364, 102.1591],

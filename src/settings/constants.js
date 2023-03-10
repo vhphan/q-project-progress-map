@@ -9,3 +9,51 @@ export const siteNameColumn = 'Site Name';
 export const systemIdColumn = 'Technology';
 export const clusterIdColumn = 'Cluster_ID';
 export const districtIdColumn = 'DISTRICT';
+export const expectedHeadersDistrict = [
+    [
+        "District",
+        "Region",
+        "Overall progress",
+        null,
+        null
+    ],
+    [
+        null,
+        null,
+        "Overall\n% Co-Loc",
+        "% Deployment\n(CME & above)",
+        "% Deployment\n(OA & OB)"
+    ],
+];
+export const finalHeadersDistrict = [
+    "District",
+    "Region",
+    "Overall progress",
+    "Overall % Co-Loc",
+    "% Deployment (CME & above)",
+    "% Deployment (OA & OB)"
+];
+export const expectedHeadersCluster = [
+    [
+        "Cluster",
+        "Region",
+        "OA & OB",
+        "+INT",
+        "+CME End",
+        "+CME Start",
+        "+LOO",
+        "+TP App",
+        "Launch clusters"
+    ],
+];
+export const finalHeadersCluster = [
+    "Cluster",
+    "Region",
+    "OA & OB",
+    "+INT",
+    "+CME End",
+    "+CME Start",
+    "+LOO",
+    "+TP App",
+    "Launch clusters"
+];

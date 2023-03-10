@@ -409,7 +409,6 @@ function makeSiteLayers({
 
                 let html = '';
                 for (const [key, value] of Object.entries(feature.properties)) {
-                    console.log(key, value);
                     if (value) {
                         html += `<b>${key}</b>: ${value}<br>`;
                     }

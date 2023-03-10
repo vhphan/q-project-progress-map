@@ -62,6 +62,11 @@ const addInterceptor = (instance) => {
             // );
             colorTrace(`Success indicator is false or missing. ${response.config.url}`, 'red');
         }
+        if (response.data.message) {
+            triggerInfo(
+                {message: response.data.message}
+            );
+        }
         return response;
     }, function (error) {
         const errObj = (error.toJSON && error.toJSON()) || error;

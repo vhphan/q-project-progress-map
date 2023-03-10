@@ -517,3 +517,20 @@ export const getTodayDateString = function () {
     return `${yyyy}-${mm}-${dd}`;
 };
 
+export function getScaleLegendChroma2(
+    scale,
+    limits,
+    displayValues=true
+) {
+    const $wrap = document.createElement('div');
+    $wrap.innerHTML = limits.reduce((save, value, i) => {
+        const displayedValue = displayValues? `${(value).toLocaleString('en')}`: '';
+        const currentDiv = `<div style="width: 100%; height: ${displayValues? 'auto': '0.5em'}; color: ${scale(value).get('lab.l') < 70 ? '#fff' : '#000'}; background-color: ${scale(value).hex()}; text-align: center;">${displayedValue}</div>`;
+        if (save.indexOf(currentDiv) >= 0) {
+            return save;
+        }
+        return `${save}${currentDiv}`
+    }, '');
+    return $wrap;
+}
+
