@@ -258,7 +258,7 @@ export function redirectToLogin(errorMessage, authLoginUrl) {
         () => {
             window.location = authLoginUrl;
         }
-        , 5000);
+        , 1000);
 }
 
 export const properCase = function (str) {

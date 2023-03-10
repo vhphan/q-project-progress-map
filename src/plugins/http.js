@@ -89,7 +89,8 @@ const addInterceptor = (instance) => {
 
         });
         if ([401, 403].includes(response.status)) {
-            debounce(() => redirectToLogin('You may be logged out!', authLoginUrl), 1000);
+            redirectToLogin('You may be logged out!', authLoginUrl)
+            // debounce(() => redirectToLogin('You may be logged out!', authLoginUrl), 1000);
         }
         if (response.status !== 200) {
             triggerNegative({
