@@ -108,7 +108,7 @@
             glossy
             label="Apply/Redraw"
             @click="()=>redraw()"
-            class="col-5 q-mt-xs q-mx-xs bg-blue-2"
+            class="full-width q-mt-xs bg-blue-2"
             :loading="redrawKpiLayer">
           <template v-slot:loading>
             <q-spinner-clock
@@ -117,6 +117,12 @@
             />
           </template>
         </q-btn>
+        <q-btn
+            glossy
+            class="full-width q-mt-sm bg-amber-3"
+            label="Reset Polygons Styles"
+            @click="()=>mapStore.resetPolygonsStylesTriggered = true"
+        />
 
       </q-card>
 
@@ -176,6 +182,7 @@ export default {
       availableTypesOfKpi,
       availableKpi,
       selectedKpi,
+      mapStore
     };
   }
 };

@@ -21,7 +21,7 @@ import {clusterIdColumn, districtIdColumn, operator} from "@/settings/constants"
 import {useMainStore} from "@/store/mainStore";
 import {storeToRefs} from "pinia";
 import {addSearch, addSizeSelector, loadBasicMap, makeSiteLayers} from "@/composables/basicMap";
-import {debounce, useQuasar} from "quasar";
+import {debounce} from "quasar";
 import {getCookie, loadScript, titleCase} from "@/utils/myFunctions";
 import {NODE_URL} from "@/plugins/http";
 import {BASE_URL_NODE} from "@/plugins/http";
@@ -57,10 +57,10 @@ export default {
       techLayers,
       techLayersColors,
       layerOpacity,
-      hoveredSiteInfo,
-      clickedCellInfo,
-      cellToZoomTo,
-      techLayersAdded,
+      // hoveredSiteInfo,
+      // clickedCellInfo,
+      // cellToZoomTo,
+      // techLayersAdded,
     } = storeToRefs(mapStore);
     const layerSpecs = () => {
       return techLayers.value.map((techLayer, index) => (
@@ -73,29 +73,33 @@ export default {
     };
     const {setupLeafletMap, mapResize, mapContainer} = loadBasicMap(mapObj);
 
+    const polygonsStyles = {
+      'cluster': {
+        'color': '#0000ff',
+        'weight': 1.5,
+        'fillOpacity': 0,
+        'fillColor': '#FF0000'
+      },
+      'district': {
+        'color': '#06c506',
+        'weight': 0.5,
+        'fillOpacity': 0,
+        'fillColor': '#d1d1f5'
+      }
+    };
 
     function createLayerGroups() {
-
-      const clusterPolygonStyle = {
-        color: '#0000ff',
-        weight: 1.5,
-        fillOpacity: 0,
-        fillColor: '#FF0000'
-      };
 
       const otherPolygonLayers = [
         {
           label: 'cluster',
           url: `${BASE_URL_NODE}/polygons?file=clusters&api=${apiKey}`,
-          ...clusterPolygonStyle
+          ...polygonsStyles['cluster']
         },
         {
           label: 'district',
           url: `${BASE_URL_NODE}/polygons?file=districts&api=${apiKey}`,
-          color: '#06c506',
-          weight: 1.5,
-          fillOpacity: 0,
-          fillColor: '#d1d1f5'
+          ...polygonsStyles['district']
         }
       ];
 
@@ -269,12 +273,34 @@ export default {
 
         layer.setStyle({
           fillColor: getColor(layer.feature.properties[polygonIdColumn]),
-          weight: 0.5,
+          weight: 0.1,
+          color: '#a6a6a6',
           fillOpacity: 0.5,
         });
       });
       mapTitle.value = `${titleCase(selectedTypeOfKpi.value)}: ${titleCase(selectedKpi.value[selectedTypeOfKpi.value])}`;
       redrawKpiLayer.value = false;
+    });
+
+    const resetPolygonLayersStyles = () => {
+      mapObj.layerGroups.cluster.eachLayer((layer) => {
+        layer.setStyle({
+          ...polygonsStyles.cluster,
+        });
+      });
+      mapObj.layerGroups.district.eachLayer((layer) => {
+        layer.setStyle({
+          ...polygonsStyles.district,
+        });
+      });
+    };
+
+    const {resetPolygonsStylesTriggered} = storeToRefs(mapStore);
+    watch(resetPolygonsStylesTriggered, (newValue) => {
+      if (newValue) {
+        resetPolygonLayersStyles();
+        mapStore.resetPolygonsStylesTriggered = false;
+      }
     });
 
     return {
