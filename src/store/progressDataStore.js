@@ -20,6 +20,11 @@ export const useProgressDataStore = defineStore({
             cluster: "OA & OB",
             district: "Overall progress",
         }),
+        selectedTypeOfKpi: useStorage('selectedTypeOfKpi', 'district'),
+        availableTypesOfKpi: [
+            {label: 'District', value: 'district'},
+            {label: 'Cluster', value: 'cluster'},
+        ],
 
     }),
     getters: {

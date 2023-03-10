@@ -17,7 +17,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-geosearch/dist/geosearch.css';
 import 'leaflet-easybutton';
 import {useMapStore} from "@/store/mapStore";
-import {operator} from "@/settings/constants";
+import {clusterIdColumn, districtIdColumn, operator} from "@/settings/constants";
 import {useMainStore} from "@/store/mainStore";
 import {storeToRefs} from "pinia";
 import {addSearch, addSizeSelector, loadBasicMap, makeSiteLayers} from "@/composables/basicMap";
@@ -25,6 +25,8 @@ import {debounce} from "quasar";
 import {getCookie, loadScript} from "@/utils/myFunctions";
 import {NODE_URL} from "@/plugins/http";
 import {BASE_URL_NODE} from "@/plugins/http";
+import {useProgressDataStore} from "@/store/progressDataStore.js";
+import {useCosmeticStore} from "@/store/cosmeticStore.js";
 
 
 export default {
@@ -79,16 +81,16 @@ export default {
         weight: 1.5,
         fillOpacity: 0,
         fillColor: '#FF0000'
-      }
+      };
 
       const otherPolygonLayers = [
         {
-        label: 'clusters',
-        url: `${BASE_URL_NODE}/polygons?file=clusters&api=${apiKey}`,
-        ...clusterPolygonStyle
+          label: 'cluster',
+          url: `${BASE_URL_NODE}/polygons?file=clusters&api=${apiKey}`,
+          ...clusterPolygonStyle
         },
         {
-          label: 'districts',
+          label: 'district',
           url: `${BASE_URL_NODE}/polygons?file=districts&api=${apiKey}`,
           color: '#06c506',
           weight: 1.5,
@@ -98,7 +100,7 @@ export default {
       ];
 
       const clusterClickCallBack = function (e) {
-          // console.log(e);
+        // console.log(e);
         //   e.target.feature.properties[clusterIdColumn] && (selectedCluster.value = e.target.feature.properties[clusterIdColumn]);
       };
 
@@ -173,7 +175,7 @@ export default {
       if (mapObj.map) {
         mapObj.map.invalidateSize();
       }
-    }, 500)
+    }, 500);
 
     watch(toolbarHeight, (newHeight, oldHeight) => {
       adjustMapHeight();
@@ -209,13 +211,49 @@ export default {
     });
 
 
+    const progressDataStore = useProgressDataStore();
+    const {progressData, selectedKpi, selectedTypeOfKpi} = storeToRefs(progressDataStore);
+    const {redrawKpiLayer} = storeToRefs(mapStore);
+    const cosmeticStore = useCosmeticStore();
+
+
+    const getColor = (polygonId) => {
+      const polygonIdKey = selectedTypeOfKpi.value === 'cluster' ? 'Cluster' : 'District';
+      const data = selectedTypeOfKpi.value === 'cluster' ? progressData.value.clusterData : progressData.value.districtData;
+
+      const polygonData = data.find((row) => row[polygonIdKey] === polygonId);
+      if (polygonData) {
+        return cosmeticStore.getColorScaleByMethod()(polygonData[selectedKpi.value[selectedTypeOfKpi.value]]).hex();
+      }
+      return '#ffffff';
+    };
+
+    watch(redrawKpiLayer, (newValue) => {
+      if (newValue) {
+        // mapObj.layerGroups['progress']
+        console.log(mapObj.layerGroups[selectedTypeOfKpi.value]);
+        const polygonIdColumn = selectedTypeOfKpi.value === 'cluster' ? clusterIdColumn: districtIdColumn;
+        mapObj.layerGroups[selectedTypeOfKpi.value].eachLayer((layer) => {
+
+
+          layer.setStyle({
+            fillColor: getColor(layer.feature.properties[polygonIdColumn]),
+            weight: 0.5,
+            fillOpacity: 0.5,
+          });
+        });
+        redrawKpiLayer.value = false;
+      }
+    });
+
     return {
       mapObjReactive,
       mapResize,
       makeMap,
+
     };
   }
-}
+};
 
 </script>
 

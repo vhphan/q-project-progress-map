@@ -1,24 +1,27 @@
 <template>
   <div class="q-pa-xs">
-      <q-expansion-item
+    <q-expansion-item
         expand-separator
         icon="map"
         label="Map settings"
-      >
-        Regions (sites displayed):
-        <q-select
-            :options="availableRegions"
-            v-model="selectedRegion"
-            outlined
-            style="border-color: #0d47a1;"
-        />
-      </q-expansion-item>
+        group="some-group"
+    >
+      Regions (sites displayed):
+      <q-select
+          :options="availableRegions"
+          v-model="selectedRegion"
+          outlined
+          group="some-group"
+          style="border-color: #0d47a1;"
+      />
+    </q-expansion-item>
 
     <q-expansion-item
         expand-separator
         icon="insights"
         label="KPI settings"
         caption="Select KPIs to display"
+        group="some-group"
     >
       <excel-file-selector/>
 
@@ -27,6 +30,8 @@
         expand-separator
         icon="palette"
         label="Legend Colors"
+        group="some-group"
+
     >
       <q-card>
         <q-card-section class="row">
@@ -44,7 +49,7 @@
               label="Apply/Redraw"
               @click="()=>redraw()"
               class="col-5 q-mt-xs q-mx-xs bg-blue-2"
-              :loading="redrawing">
+              :loading="redrawKpiLayer">
             <template v-slot:loading>
               <q-spinner-clock
                   size="1.5em"
@@ -73,6 +78,50 @@
       </q-card>
 
     </q-expansion-item>
+    <q-expansion-item
+        expand-separator
+        icon="info"
+        label="Select KPI"
+        group="some-group"
+    >
+      <q-card
+          bordered
+      >
+        <q-card-section>
+          <q-option-group
+              v-model="selectedTypeOfKpi"
+              :options="availableTypesOfKpi"
+              type="radio"
+              inline
+              color="primary"
+              dense
+          />
+        </q-card-section>
+        <q-select
+            v-model="selectedKpi[selectedTypeOfKpi]"
+            :options="availableKpi[selectedTypeOfKpi]"
+            label="Select KPI"
+            outlined
+            class="col-12"
+        />
+        <q-btn
+            glossy
+            label="Apply/Redraw"
+            @click="()=>redraw()"
+            class="col-5 q-mt-xs q-mx-xs bg-blue-2"
+            :loading="redrawKpiLayer">
+          <template v-slot:loading>
+            <q-spinner-clock
+                size="1.5em"
+                class="q-pa-xs"
+            />
+          </template>
+        </q-btn>
+
+      </q-card>
+
+
+    </q-expansion-item>
 
 
   </div>
@@ -85,6 +134,7 @@ import {storeToRefs} from "pinia";
 import ExcelFileSelector from "@/components/ExcelFileSelector.vue";
 import {useCosmeticStore} from "@/store/cosmeticStore.js";
 import {ref} from "vue";
+import {useProgressDataStore} from "@/store/progressDataStore.js";
 
 export default {
   name: "MapSideBar",
@@ -101,23 +151,18 @@ export default {
       reverseColorMap,
     } = storeToRefs(cosmeticStore);
 
-    const redrawing = ref(false);
+    const {redrawKpiLayer} = storeToRefs(mapStore);
     const redraw = () => {
-      // if (!rasterLayer.value) {
-      //   triggerWarning({
-      //     message: 'Please select a raster type and click "Get Data" to load a raster layer.'
-      //   });
-      //   return;
-      // }
-      redrawing.value = true;
+      redrawKpiLayer.value = true;
       setTimeout(() => {
-        // rasterStore.drawRasterLayer();
-
-
-        redrawing.value = false;
-      }, 100);
-
+        redrawKpiLayer.value = false;
+      }, 10_000);
     };
+
+    const progressDataStore = useProgressDataStore();
+    const {selectedTypeOfKpi, availableTypesOfKpi, availableKpi, selectedKpi} = storeToRefs(progressDataStore);
+
+
     return {
       availableRegions: regions,
       selectedRegion: region,
@@ -125,8 +170,12 @@ export default {
       colorMapList,
       colorMap,
       reverseColorMap,
-      redrawing,
+      redrawKpiLayer,
       redraw,
+      selectedTypeOfKpi,
+      availableTypesOfKpi,
+      availableKpi,
+      selectedKpi,
     };
   }
 };
