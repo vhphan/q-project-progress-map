@@ -272,6 +272,7 @@ export default {
         layer.bindPopup(html);
         layer.bindTooltip(additionalPopUp);
 
+        polygonLayerOpacity.value = 0.5;
         layer.setStyle({
           fillColor: getColor(layer.feature.properties[polygonIdColumn]),
           weight: 0.1,
@@ -284,6 +285,7 @@ export default {
     });
 
     const resetPolygonLayersStyles = () => {
+      polygonLayerOpacity.value = 0.1;
       mapObj.layerGroups.cluster.eachLayer((layer) => {
         layer.setStyle({
           ...polygonsStyles.cluster,
