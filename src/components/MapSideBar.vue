@@ -58,7 +58,14 @@
             </template>
           </q-btn>
         </q-card-section>
-
+        <q-card-section>
+          <q-slider
+            v-model="polygonLayerOpacity"
+            :min="0"
+            :max="1"
+            :step="0.1"
+          />
+        </q-card-section>
 
       </q-card>
 
@@ -139,7 +146,7 @@ import {storeToRefs} from "pinia";
 
 import ExcelFileSelector from "@/components/ExcelFileSelector.vue";
 import {useCosmeticStore} from "@/store/cosmeticStore.js";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import {useProgressDataStore} from "@/store/progressDataStore.js";
 
 export default {
@@ -168,6 +175,8 @@ export default {
     const progressDataStore = useProgressDataStore();
     const {selectedTypeOfKpi, availableTypesOfKpi, availableKpi, selectedKpi} = storeToRefs(progressDataStore);
 
+    const {polygonLayerOpacity} = storeToRefs(mapStore);
+    // const {testOpacity} = storeToRefs(mapStore);
 
     return {
       availableRegions: regions,
@@ -182,7 +191,8 @@ export default {
       availableTypesOfKpi,
       availableKpi,
       selectedKpi,
-      mapStore
+      mapStore,
+      polygonLayerOpacity,
     };
   }
 };

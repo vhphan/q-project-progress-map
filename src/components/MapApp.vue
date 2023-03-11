@@ -57,6 +57,7 @@ export default {
       techLayers,
       techLayersColors,
       layerOpacity,
+      polygonLayerOpacity,
       // hoveredSiteInfo,
       // clickedCellInfo,
       // cellToZoomTo,
@@ -77,13 +78,13 @@ export default {
       'cluster': {
         'color': '#0000ff',
         'weight': 1.5,
-        'fillOpacity': 0,
+        'fillOpacity': polygonLayerOpacity.value,
         'fillColor': '#FF0000'
       },
       'district': {
         'color': '#06c506',
         'weight': 0.5,
-        'fillOpacity': 0,
+        'fillOpacity': polygonLayerOpacity.value,
         'fillColor': '#d1d1f5'
       }
     };
@@ -275,7 +276,7 @@ export default {
           fillColor: getColor(layer.feature.properties[polygonIdColumn]),
           weight: 0.1,
           color: '#a6a6a6',
-          fillOpacity: 0.5,
+          fillOpacity: polygonLayerOpacity.value,
         });
       });
       mapTitle.value = `${titleCase(selectedTypeOfKpi.value)}: ${titleCase(selectedKpi.value[selectedTypeOfKpi.value])}`;
@@ -302,6 +303,21 @@ export default {
         mapStore.resetPolygonsStylesTriggered = false;
       }
     });
+
+    const changePolygonOpacity = debounce(() => {
+      mapObj.layerGroups.cluster.setStyle({
+        fillOpacity: polygonLayerOpacity.value,
+      });
+      mapObj.layerGroups.district.setStyle({
+        fillOpacity: polygonLayerOpacity.value,
+      });
+    }, 800);
+
+    watch(polygonLayerOpacity, () => {
+      console.log(polygonLayerOpacity.value);
+      changePolygonOpacity();
+    });
+
 
     return {
       mapObjReactive,
