@@ -16,7 +16,7 @@ export const useCosmeticStore = defineStore("raster", {
         ],
         reverseColorMap: useStorage('reverseColorMap', false),
         legendLimits: [],
-        numberOfClasses: 16,
+        numberOfClasses: 10,
     }),
     getters: {
         colorMapMapping: (state) => {

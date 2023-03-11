@@ -11,7 +11,7 @@ export const useMapStore = defineStore('map', {
             layerOpacity: 0.2,
             baseMapOpacity: 1,
             coverageMapOpacity: 1,
-            polygonLayerOpacity: 0,
+            polygonLayerOpacity: 0.1,
             testOpacity: 0,
             popUpInfo: null,
             chloroplethData: null,

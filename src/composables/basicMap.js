@@ -421,6 +421,7 @@ function makeSiteLayers({
                     color: polygonLayer.color,
                     weight: polygonLayer.weight,
                     fillOpacity: polygonLayer.fillOpacity,
+                    fillColor: polygonLayer.fillColor
                 };
             }
         });

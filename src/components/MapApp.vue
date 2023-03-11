@@ -76,16 +76,16 @@ export default {
 
     const polygonsStyles = {
       'cluster': {
-        'color': '#0000ff',
+        'color': '#5b0611',
         'weight': 1.5,
         'fillOpacity': polygonLayerOpacity.value,
-        'fillColor': '#FF0000'
+        'fillColor': '#ffffff'
       },
       'district': {
         'color': '#06c506',
         'weight': 0.5,
         'fillOpacity': polygonLayerOpacity.value,
-        'fillColor': '#d1d1f5'
+        'fillColor': '#ffffff'
       }
     };
 
