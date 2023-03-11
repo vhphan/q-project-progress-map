@@ -171,7 +171,7 @@ export default {
       addSizeSelector({map: mapObj.map, sectorSize: sectorSize.value, refreshFunc: refreshLayersWithNewSize});
     }
 
-    const toolbarHeight = computed(() => document.getElementById('toolbar')?.offsetHeight || 100);
+    const toolbarHeight = computed(() => document.getElementById('toolbar')?.offsetHeight || 60);
     const adjustMapHeight = debounce(function () {
       if (!document.getElementById(mapObj.id)) {
         return;

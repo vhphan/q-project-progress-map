@@ -63,7 +63,7 @@
             v-model="polygonLayerOpacity"
             :min="0"
             :max="1"
-            :step="0.1"
+            :step="0.05"
           />
         </q-card-section>
 
