@@ -32,7 +32,17 @@
         group="some-group"
 
     >
-      <q-card>
+      <q-option-group
+          type="radio"
+          inline
+          color="primary"
+          v-model="selectedLegendType"
+          :options="availableLegendTypes"
+      />
+
+      <custom-color-range v-if="selectedLegendType==='custom'" />
+
+      <q-card v-if="selectedLegendType==='presets'">
         <q-card-section class="row">
           <q-select
               v-model="colorMap"
@@ -59,10 +69,10 @@
         </q-card-section>
         <q-card-section>
           <q-slider
-            v-model="polygonLayerOpacity"
-            :min="0.1"
-            :max="1"
-            :step="0.05"
+              v-model="polygonLayerOpacity"
+              :min="0.1"
+              :max="1"
+              :step="0.05"
           />
         </q-card-section>
 
@@ -72,11 +82,10 @@
         <q-card-section>
 
           <div class="text-h6"><span>Legend: </span>
-            <!--          <span v-if="rasterMeta">{{ rasterMeta.title }}</span>-->
-            <!--          <span v-else>Nothing Loaded<q-tooltip>Click 'Get Data' to Load a Raster</q-tooltip></span>-->
           </div>
           <div
               v-html="getLegend"
+              v-if="selectedLegendType==='presets'"
           ></div>
 
         </q-card-section>
@@ -145,12 +154,12 @@ import {storeToRefs} from "pinia";
 
 import ExcelFileSelector from "@/components/ExcelFileSelector.vue";
 import {useCosmeticStore} from "@/store/cosmeticStore.js";
-import {computed, ref} from "vue";
 import {useProgressDataStore} from "@/store/progressDataStore.js";
+import CustomColorRange from "@/components/CustomColorRange.vue";
 
 export default {
   name: "MapSideBar",
-  components: {ExcelFileSelector},
+  components: {CustomColorRange, ExcelFileSelector},
   setup() {
     const mapStore = useMapStore();
     const {region, regions} = storeToRefs(mapStore);
@@ -177,6 +186,11 @@ export default {
     const {polygonLayerOpacity} = storeToRefs(mapStore);
     // const {testOpacity} = storeToRefs(mapStore);
 
+    const {
+      availableLegendTypes,
+      selectedLegendType,
+    } = storeToRefs(cosmeticStore);
+
     return {
       availableRegions: regions,
       selectedRegion: region,
@@ -192,6 +206,8 @@ export default {
       selectedKpi,
       mapStore,
       polygonLayerOpacity,
+      availableLegendTypes,
+      selectedLegendType,
     };
   }
 };

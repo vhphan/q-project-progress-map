@@ -6,7 +6,7 @@ import {colorMaps, colorMapsKeys} from "@/utils/colorMaps.js";
 import {useStorage} from '@vueuse/core';
 import {useMapStore} from "@/store/mapStore.js";
 
-export const useCosmeticStore = defineStore("raster", {
+export const useCosmeticStore = defineStore("cosmetic", {
     state: () => ({
         colorMap: useStorage('colorMap', 'Yellow to Red'),
         colorMapList: [
@@ -17,6 +17,29 @@ export const useCosmeticStore = defineStore("raster", {
         reverseColorMap: useStorage('reverseColorMap', false),
         legendLimits: [],
         numberOfClasses: 10,
+        availableLegendTypes: [
+            {
+                label: "Custom",
+                value: "custom"
+            },
+            {
+                label: "Presets",
+                value: "presets"
+            }
+        ],
+        selectedLegendType: 'custom',
+
+        customLegend: useStorage('customLegend', [
+            '#ff0000',
+            '#faee10',
+            '#06c506'
+        ]),
+        customRanges: useStorage('customRanges', [
+            0,
+            0.6,
+            0.7,
+            1
+        ]),
     }),
     getters: {
         colorMapMapping: (state) => {
@@ -42,6 +65,11 @@ export const useCosmeticStore = defineStore("raster", {
             state.legendLimits = limits;
             return chroma.scale(state.getColorMap).domain(limits);
         },
+        // chroma.scale(['yellow', 'lightgreen', '008ae5'])
+        //     .domain([0,0.25,1]);
+        getColorScaleWithCustomFunc: ({customColors, customRanges}) => {
+            return chroma.scale(customColors).classes(customRanges);
+        },
         getLegend: (state) => {
             const scale = state.getColorScaleByMethod();
             return getScaleLegendChroma2(scale, state.legendLimits, state.raster100).outerHTML;
@@ -49,6 +77,9 @@ export const useCosmeticStore = defineStore("raster", {
         getMinMax: (state) => {
             return [0, 1];
         },
+        getNumberOfClasses: ({customRanges}) => {
+            return customRanges.length - 1;
+        }
     },
     actions: {
         async getCellCentroid(cellName) {
@@ -58,5 +89,8 @@ export const useCosmeticStore = defineStore("raster", {
             const jsonData = (await apiNode.get(centroidUrl)).data;
             return jsonData.data;
         },
+        getRandomColors(numOfColors = 10) {
+            return [...Array(numOfColors)].map(() => chroma.random().hex());
+        }
     },
 });

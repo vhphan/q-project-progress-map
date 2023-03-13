@@ -78,6 +78,7 @@ export const useMapStore = defineStore('map', {
             redrawKpiLayer: false,
             mapTitle: '',
             resetPolygonsStylesTriggered: false,
+
         }
     },
     getters: {

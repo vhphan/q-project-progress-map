@@ -1,10 +1,11 @@
 // import chroma from "chroma-js";
 
 //
-// export function getRandomColors(numOfColors) {
-//   return [...Array(numOfColors)].map(() => chroma.random().hex());
-// }
 import {Notify} from 'quasar';
+
+// export function getRandomColors(numOfColors, chroma) {
+//     return [...Array(numOfColors)].map(() => chroma.random().hex());
+// }
 
 export const loadScript = function (url, scriptClass, callback = null) {
     let isLoaded = document.querySelectorAll('.' + scriptClass);
