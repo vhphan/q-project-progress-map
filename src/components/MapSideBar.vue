@@ -18,9 +18,8 @@
 
     <q-expansion-item
         expand-separator
-        icon="insights"
+        icon="analytics"
         label="KPI settings"
-        caption="Select KPIs to display"
         group="some-group"
     >
       <excel-file-selector/>
@@ -87,7 +86,7 @@
     </q-expansion-item>
     <q-expansion-item
         expand-separator
-        icon="info"
+        icon="insights"
         label="Select KPI"
         group="some-group"
     >

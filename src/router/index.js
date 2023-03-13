@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router';
 
 import Page1 from "@/pages/Page1.vue";
 import {basePath} from "@/settings/constants";
+import About from "@/pages/About.vue";
 
 const routes = [
     {
@@ -14,6 +15,11 @@ const routes = [
         name: 'Page1',
         component: Page1,
         meta: {label: 'Home'}
+    },{
+        path: basePath + 'about',
+        name: 'About',
+        component: About,
+        meta: {label: 'About'}
     },
     // {
     //     path: basePath + 'page2',

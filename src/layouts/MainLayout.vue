@@ -13,15 +13,14 @@
           </q-avatar>
           Project Dashboard
         </q-toolbar-title>
-        <q-space/>
         <span class="text-h5 text-bold" style="text-decoration: underline;">{{mapTitle}}</span>
-        <q-space/>
 
-        <q-tabs align="left">
+        <q-tabs align="left" class="q-ml-md">
           <q-route-tab :to="`${basePath}page1`" label="Page One"/>
-<!--          <q-route-tab :to="`${basePath}page2`" label="Page Two"/>-->
+          <q-route-tab :to="`${basePath}about`" label="About"/>
 <!--          <q-route-tab :to="`${basePath}page3`" label="Page Three"/>-->
         </q-tabs>
+        <q-space/>
       </q-toolbar>
 
     </q-header>

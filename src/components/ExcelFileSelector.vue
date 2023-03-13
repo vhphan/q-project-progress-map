@@ -34,7 +34,7 @@
 
 
         >
-          <template v-slot:append>
+          <template v-slot:after>
             <q-btn round dense flat icon="refresh" @click="getAvailableData"  />
           </template>
 
@@ -178,7 +178,6 @@ export default {
           message: "Excel data uploaded successfully",
         });
 
-
       }).catch((error) => {
         console.log(error);
         triggerNegative({
@@ -225,7 +224,6 @@ export default {
       dataFileNameLoaded,
       getAvailableData,
     };
-
   }
 };
 </script>

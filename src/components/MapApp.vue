@@ -76,7 +76,7 @@ export default {
 
     const polygonsStyles = {
       'cluster': {
-        'color': '#5b0611',
+        'color': 'rgba(152,119,127,0.85)',
         'weight': 1.5,
         'fillOpacity': polygonLayerOpacity.value,
         'fillColor': '#ffffff'
