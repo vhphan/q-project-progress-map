@@ -10,66 +10,70 @@
           :max="9"
           dense
       />
-      <div
-          v-for="(legend, i) in customRanges"
-          :key="i"
-          class="row"
-          style="padding: 0; margin: 0;"
-      >
-        <!--        <q-input-->
-        <!--            v-if="i!==0"-->
-        <!--            filled-->
-        <!--            v-model="customLegend[i-1]"-->
-        <!--            class="my-input col-6"-->
-        <!--            readonly-->
-        <!--        >-->
-        <!--          <template v-slot:append>-->
-        <div>
-          <q-btn
-              v-if="i>0"
-              class="col-2 full-height"
-              :style="`background-color: ${customLegend[i-1]}; width:45px;` "
-          />
-          <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="col-3 q-pa-xs">
-            <q-color v-model="customLegend[i-1]"/>
-          </q-popup-proxy>
-        </div>
-        <!--          </template>-->
-        <!--        </q-input>-->
 
-        <q-item class="col-9" v-if="i>0">
-          <q-item-section class="q-my-auto q-px-xs" style="font-size: 13px; padding: 0;">
-            {{ (customRanges[i - 1] * 100).toFixed(0) }}% &nbsp&le; x &lt&nbsp {{ (customRanges[i] * 100).toFixed(0) }}%
-          </q-item-section>
-        </q-item>
 
-        <q-slider
-            v-model="customRanges[i]"
-            :disable="i===0 || i===customRanges.length-1"
-            :min="0"
-            :max="1"
-            :step="0.01"
-            :key="i"
-            :markers="true"
-            :dense="true"
-            color="purple-3"
-            @update:model-value="() => modelValueFunction"
+    </q-card-section>
+  </q-card>
+  <q-card bordered style=" border-color: #535bf2;">
+
+    <q-card-section
+        v-for="(_, i) in customRanges"
+        :key="i"
+        class="row"
+        style="padding: 1px; margin: 1px;"
+    >
+      <!--        <q-input-->
+      <!--            v-if="i!==0"-->
+      <!--            filled-->
+      <!--            v-model="customLegend[i-1]"-->
+      <!--            class="my-input col-6"-->
+      <!--            readonly-->
+      <!--        >-->
+      <!--          <template v-slot:append>-->
+      <div>
+        <q-btn
+            v-if="i>0"
+            class="col-2 full-height"
+            :style="`background-color: ${customLegend[i-1]}; width:45px;` "
         />
-
-        <!--        <q-range-->
-        <!--            v-if="i>0"-->
-        <!--            v-model="{min: customRanges[i-1], max: customRanges[i]}"-->
-        <!--            :min="0"-->
-        <!--            :max="1"-->
-        <!--            :step="0.01"-->
-        <!--            :key="i"-->
-        <!--            :markers="true"-->
-        <!--            :dense="true"-->
-
-        <!--        />-->
-
+        <q-popup-proxy cover transition-show="scale" transition-hide="scale" class="col-3 q-pa-xs">
+          <q-color v-model="customLegend[i-1]"/>
+        </q-popup-proxy>
       </div>
+      <!--          </template>-->
+      <!--        </q-input>-->
 
+      <q-item class="col-9" v-if="i>0">
+        <q-item-section class="q-my-auto q-px-xs" style="font-size: 13px; padding: 0;">
+          {{ (customRanges[i - 1] * 100).toFixed(0) }}% &nbsp&le; x &lt&nbsp {{ (customRanges[i] * 100).toFixed(0) }}%
+        </q-item-section>
+      </q-item>
+
+      <q-slider
+          v-model="customRanges[i]"
+          :disable="i===0 || i===customRanges.length-1"
+          v-if="!(i===0 || i===customRanges.length-1)"
+          :min="0"
+          :max="1"
+          :step="0.01"
+          :key="i"
+          :markers="true"
+          :dense="true"
+          color="purple-3"
+          @update:model-value="() => modelValueFunction"
+      />
+
+      <!--        <q-range-->
+      <!--            v-if="i>0"-->
+      <!--            v-model="{min: customRanges[i-1], max: customRanges[i]}"-->
+      <!--            :min="0"-->
+      <!--            :max="1"-->
+      <!--            :step="0.01"-->
+      <!--            :key="i"-->
+      <!--            :markers="true"-->
+      <!--            :dense="true"-->
+
+      <!--        />-->
 
     </q-card-section>
   </q-card>

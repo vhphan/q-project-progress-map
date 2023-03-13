@@ -67,6 +67,24 @@
             </template>
           </q-btn>
         </q-card-section>
+
+
+      </q-card>
+
+      <q-card>
+        <q-card-section v-if="selectedLegendType==='presets'">
+
+          <div class="text-h6"><span>Legend: </span>
+          </div>
+          <div
+              v-html="getLegend"
+          ></div>
+
+        </q-card-section>
+
+      </q-card>
+      <q-card>
+
         <q-card-section>
           <q-slider
               v-model="polygonLayerOpacity"
@@ -74,20 +92,6 @@
               :max="1"
               :step="0.05"
           />
-        </q-card-section>
-
-      </q-card>
-
-      <q-card>
-        <q-card-section>
-
-          <div class="text-h6"><span>Legend: </span>
-          </div>
-          <div
-              v-html="getLegend"
-              v-if="selectedLegendType==='presets'"
-          ></div>
-
         </q-card-section>
 
       </q-card>
