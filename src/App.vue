@@ -23,6 +23,7 @@ export default {
 <style>
 /*@import "tabulator-tables/dist/css/tabulator.min.css";*/
 @import "tabulator-tables/dist/css/tabulator_modern.min.css";
+@import "style.css";
 
 .tabulator {
   font-size: 0.8rem;

@@ -2,20 +2,35 @@
   <q-card>
     <!--  color pickers for legend with selectable range values-->
     <q-card-section>
-
+      <q-badge color="secondary">
+        Number of Ranges:
+      </q-badge>
       <q-slider
           v-model="numberOfClasses"
           marker-labels
           :min="3"
           :max="9"
           dense
+
       />
 
 
     </q-card-section>
   </q-card>
-  <q-card bordered style=" border-color: #535bf2;">
-
+  <q-card class="my-card">
+    <q-btn
+        glossy
+        label="Apply/Redraw"
+        @click="()=>redraw()"
+        class="full-width q-mt-xs bg-blue-2"
+        :loading="redrawKpiLayer">
+      <template v-slot:loading>
+        <q-spinner-clock
+            size="1.5em"
+            class="q-pa-xs"
+        />
+      </template>
+    </q-btn>
     <q-card-section
         v-for="(_, i) in customRanges"
         :key="i"
@@ -84,6 +99,7 @@ import {computed, ref, watch} from "vue";
 import {useCosmeticStore} from "@/store/cosmeticStore.js";
 import {storeToRefs} from "pinia";
 import {debounce} from "quasar";
+import {useMapStore} from "@/store/mapStore.js";
 
 export default {
   name: "CustomColorRange",
@@ -140,12 +156,19 @@ export default {
 
 
     };
+
+    const mapStore = useMapStore();
+    const {redrawKpiLayer} = storeToRefs(mapStore);
+    const {redraw} = mapStore;
+
     return {
       color,
       numberOfClasses,
       customLegend,
       customRanges,
       modelValueFunction,
+      redrawKpiLayer,
+      redraw,
     };
   },
 };

@@ -86,6 +86,12 @@ export default {
         'weight': 0.5,
         'fillOpacity': polygonLayerOpacity.value,
         'fillColor': '#ffffff'
+      },
+      'hidden': {
+        'color': '#ffffff',
+        'weight': 0,
+        'fillOpacity': 0,
+        'fillColor': '#ffffff'
       }
     };
 
@@ -191,7 +197,6 @@ export default {
     }, 1500);
 
     function makeMap() {
-      console.log('making map');
       if (window.google) {
         makeMapCallBack();
         return;
@@ -222,16 +227,15 @@ export default {
     const cosmeticStore = useCosmeticStore();
 
 
-    const getColor = (polygonId) => {
-      const polygonIdKey = selectedTypeOfKpi.value === 'cluster' ? 'Cluster' : 'District';
-      const data = selectedTypeOfKpi.value === 'cluster' ? progressData.value.clusterData : progressData.value.districtData;
-
-      const polygonData = data.find((row) => row[polygonIdKey] === polygonId);
+    const getColor = (polygonData) => {
       if (polygonData) {
-        return cosmeticStore.getColorScaleByMethod()(polygonData[selectedKpi.value[selectedTypeOfKpi.value]]).hex();
+        const colorFunc = cosmeticStore.getColorScaleByMethod();
+        let polygonDatum = polygonData[selectedKpi.value[selectedTypeOfKpi.value]];
+        return colorFunc(polygonDatum).hex();
       }
       return '#ffffff';
     };
+
 
     const getAdditionalPopUp = (polygonId) => {
       const polygonIdKey = selectedTypeOfKpi.value === 'cluster' ? 'Cluster' : 'District';
@@ -244,9 +248,31 @@ export default {
     };
 
     const {dataLoaded} = storeToRefs(progressDataStore);
-    // const $q = useQuasar();
-    watch(redrawKpiLayer, async (newValue) => {
 
+    function getStyle(layer, polygonIdColumn) {
+      const polygonId = layer.feature.properties[polygonIdColumn];
+      const polygonIdKey = selectedTypeOfKpi.value === 'cluster' ? 'Cluster' : 'District';
+      const data = selectedTypeOfKpi.value === 'cluster' ? progressData.value.clusterData : progressData.value.districtData;
+      const polygonData = data.find((row) => row[polygonIdKey] === polygonId);
+      console.log('getting style');
+      if (!polygonData) {
+        return polygonsStyles[selectedTypeOfKpi.value];
+      }
+      if (selectedRegionPolygon.value !== 'ALL' && polygonData['Region'] !== selectedRegionPolygon.value) {
+        return polygonsStyles['hidden'];
+      }
+
+      return {
+        fillColor: getColor(polygonData),
+        weight: 0.1,
+        color: '#a6a6a6',
+        fillOpacity: polygonLayerOpacity.value,
+      };
+    }
+
+// const $q = useQuasar();
+    watch(redrawKpiLayer, async (newValue) => {
+      console.log('redrawKpiLayer triggered', newValue);
       if (!newValue) {
         return;
       }
@@ -257,7 +283,6 @@ export default {
         await progressDataStore.queryProgressData();
         // $q.loading.hide();
       }
-      console.log(mapObj.layerGroups[selectedTypeOfKpi.value]);
       const polygonIdColumn = selectedTypeOfKpi.value === 'cluster' ? clusterIdColumn : districtIdColumn;
       mapObj.layerGroups[selectedTypeOfKpi.value].eachLayer((layer) => {
 
@@ -273,16 +298,14 @@ export default {
         layer.bindTooltip(additionalPopUp);
 
         polygonLayerOpacity.value = 0.5;
-        layer.setStyle({
-          fillColor: getColor(layer.feature.properties[polygonIdColumn]),
-          weight: 0.1,
-          color: '#a6a6a6',
-          fillOpacity: polygonLayerOpacity.value,
-        });
+        layer.setStyle(getStyle(layer, polygonIdColumn));
       });
       mapTitle.value = `${titleCase(selectedTypeOfKpi.value)}: ${titleCase(selectedKpi.value[selectedTypeOfKpi.value])}`;
       redrawKpiLayer.value = false;
     });
+
+
+    const {selectedRegionPolygon} = storeToRefs(cosmeticStore);
 
     const resetPolygonLayersStyles = () => {
       polygonLayerOpacity.value = 0.1;
@@ -316,7 +339,6 @@ export default {
     }, 800);
 
     watch(polygonLayerOpacity, () => {
-      console.log(polygonLayerOpacity.value);
       changePolygonOpacity();
     });
 

@@ -1,4 +1,4 @@
-import {defineStore} from 'pinia'
+import {defineStore} from 'pinia';
 import {useStorage} from "@vueuse/core";
 import {regions, techLayers} from "@/settings/constants.js";
 
@@ -79,7 +79,7 @@ export const useMapStore = defineStore('map', {
             mapTitle: '',
             resetPolygonsStylesTriggered: false,
 
-        }
+        };
     },
     getters: {
         clickedCellInfoRows: (state) => {
@@ -87,8 +87,17 @@ export const useMapStore = defineStore('map', {
                 return {
                     key: key,
                     value: value
-                }
-            })
+                };
+            });
         },
+    },
+    actions: {
+        redraw: function () {
+            this.redrawKpiLayer = true;
+            setTimeout(() => {
+                    this.redrawKpiLayer = false;
+                },
+                10_000);
+        }
     }
-})
+});

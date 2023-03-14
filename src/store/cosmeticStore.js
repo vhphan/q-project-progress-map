@@ -40,6 +40,7 @@ export const useCosmeticStore = defineStore("cosmetic", {
             0.7,
             1
         ]),
+        selectedRegionPolygon: useStorage('selectedRegionPolygon','ALL'),
     }),
     getters: {
         colorMapMapping: (state) => {
@@ -60,19 +61,32 @@ export const useCosmeticStore = defineStore("cosmetic", {
         getColorMap: (state) => {
             return state.colorMapMapping[state.colorMap];
         },
-        getColorScaleByMethod: (state) => (method = 'q', numberOfRanges = state.numberOfClasses) => {
-            const limits = chroma.limits(state.getMinMax, method, numberOfRanges);
+        getColorScaleByMethod: (state) => (method = 'q') => {
+
+            const {
+                selectedLegendType,
+                customLegend,
+                customRanges,
+                getMinMax,
+                getColorMap,
+                numberOfClasses
+            } = state;
+
+            if (selectedLegendType === 'custom') {
+                return chroma.scale(customLegend).classes(customRanges);
+            }
+            const limits = chroma.limits(getMinMax, method, numberOfClasses);
             state.legendLimits = limits;
-            return chroma.scale(state.getColorMap).domain(limits);
+            return chroma.scale(getColorMap).domain(limits);
         },
         // chroma.scale(['yellow', 'lightgreen', '008ae5'])
         //     .domain([0,0.25,1]);
-        getColorScaleWithCustomFunc: ({customColors, customRanges}) => {
-            return chroma.scale(customColors).classes(customRanges);
-        },
+        // getColorScaleWithCustomFunc: ({customColors, customRanges}) => {
+        //     return chroma.scale(customColors).classes(customRanges);
+        // },
         getLegend: (state) => {
             const scale = state.getColorScaleByMethod();
-            return getScaleLegendChroma2(scale, state.legendLimits, state.raster100).outerHTML;
+            return getScaleLegendChroma2(scale, state.legendLimits).outerHTML;
         },
         getMinMax: (state) => {
             return [0, 1];

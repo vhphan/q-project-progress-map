@@ -6,14 +6,15 @@
         label="Map settings"
         group="some-group"
     >
-      Regions (sites displayed):
+      Regions (<span class="text-bold">Sites</span> displayed):
       <q-select
           :options="availableRegions"
           v-model="selectedRegion"
           outlined
-          group="some-group"
           style="border-color: #0d47a1;"
       />
+
+
     </q-expansion-item>
 
     <q-expansion-item
@@ -32,17 +33,28 @@
         group="some-group"
 
     >
-      <q-option-group
-          type="radio"
-          inline
-          color="primary"
-          v-model="selectedLegendType"
-          :options="availableLegendTypes"
-      />
+      <q-card class="my-card">
+        <q-select
+            class="q-ma-xs"
+            :options="[...availableRegions, 'ALL']"
+            v-model="selectedRegionPolygon"
+            outlined
+            style="border-color: #0d47a1;"
+            label="Filter Region to Display"
+        />
+        <q-separator />
+        <q-option-group
+            type="radio"
+            inline
+            color="primary"
+            v-model="selectedLegendType"
+            :options="availableLegendTypes"
+        />
 
-      <custom-color-range v-if="selectedLegendType==='custom'" />
+        <custom-color-range v-if="selectedLegendType==='custom'"/>
+      </q-card>
 
-      <q-card v-if="selectedLegendType==='presets'">
+      <q-card class="my-card" v-if="selectedLegendType==='presets'">
         <q-card-section class="row">
           <q-select
               v-model="colorMap"
@@ -71,26 +83,25 @@
 
       </q-card>
 
-      <q-card>
-        <q-card-section v-if="selectedLegendType==='presets'">
-
-          <div class="text-h6"><span>Legend: </span>
-          </div>
+      <q-card class="my-card" v-if="selectedLegendType==='presets'">
+        <q-card-section>
+          <div class="text-h6"><span>Legend:</span></div>
           <div
               v-html="getLegend"
           ></div>
-
         </q-card-section>
-
       </q-card>
-      <q-card>
+
+      <q-card class="my-card">
 
         <q-card-section>
+          <q-item>Polygon Opacity</q-item>
           <q-slider
               v-model="polygonLayerOpacity"
               :min="0.1"
               :max="1"
               :step="0.05"
+              label
           />
         </q-card-section>
 
@@ -177,12 +188,7 @@ export default {
     } = storeToRefs(cosmeticStore);
 
     const {redrawKpiLayer} = storeToRefs(mapStore);
-    const redraw = () => {
-      redrawKpiLayer.value = true;
-      setTimeout(() => {
-        redrawKpiLayer.value = false;
-      }, 10_000);
-    };
+    const {redraw} = mapStore;
 
     const progressDataStore = useProgressDataStore();
     const {selectedTypeOfKpi, availableTypesOfKpi, availableKpi, selectedKpi} = storeToRefs(progressDataStore);
@@ -193,6 +199,7 @@ export default {
     const {
       availableLegendTypes,
       selectedLegendType,
+      selectedRegionPolygon
     } = storeToRefs(cosmeticStore);
 
     return {
@@ -212,6 +219,7 @@ export default {
       polygonLayerOpacity,
       availableLegendTypes,
       selectedLegendType,
+      selectedRegionPolygon
     };
   }
 };
