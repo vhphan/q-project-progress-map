@@ -14,7 +14,7 @@ import 'leaflet-draw';
 import {loadCss, loadScript} from "@/utils/myFunctions";
 
 import {useApi} from "../plugins/http";
-import {cellNameColumn, clusterIdColumn, districtIdColumn, siteNameColumn} from "@/settings/constants";
+import {cellNameColumn, siteNameColumn} from "@/settings/constants";
 // import {clusterIdColumn} from "../settings/constants";
 
 let siteMarker;
@@ -384,28 +384,6 @@ function makeSiteLayers({
                 if (callbackForPolygonLayer) {
                     layer.on('click', callbackForPolygonLayer);
                 }
-                // layer.on('mouseover', function () {
-                //     this.setStyle({
-                //         'fillColor': '#ff0202',
-                //         'color': '#fe0404',
-                //         'fillOpacity': 0.1,
-                //         'weight': 5,
-                //     });
-                // });
-                // layer.on('mouseout', function () {
-                //     this.setStyle({
-                //         color: polygonLayer.color,
-                //         weight: 1.5,
-                //         fillOpacity: 0,
-                //         fillColor: polygonLayer.color
-                //     });
-                // })
-                // if (clusterIdColumn in feature.properties) {
-                //     layer.bindPopup(feature.properties[clusterIdColumn]);
-                // }
-                // if (districtIdColumn in feature.properties) {
-                //     layer.bindPopup(feature.properties[districtIdColumn]);
-                // }
 
                 let html = '';
                 for (const [key, value] of Object.entries(feature.properties)) {

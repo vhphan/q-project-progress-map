@@ -14,7 +14,7 @@ export const apiUploadExcelData = async (postData) => {
     const response = (await apiNode.post(
         `/uploadExcelData`,
         postData
-    )).data;
+    ));
     return response.data;
 };
 

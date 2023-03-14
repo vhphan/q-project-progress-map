@@ -1,52 +1,52 @@
 <template>
   <div class="bg-blue-1">
-      <q-expansion-item
-          expand-separator
-          label="Upload Excel File"
-          dense
-      >
-        <span>{{ selectedFile ?? (selectedFile?.name || '') }}</span>
-        <q-input
-            @update:model-value="updateFile"
-            outlined
-            type="file"
-            hint="Excel Report"
-            class="q-ma-md"
-        />
-        <q-btn
-            :disable="!isDataValid"
-            color="primary"
-            label="Submit"
-            @click="submit"
-            glossy
-            class="q-mx-md q-my-xs"
-        />
-      </q-expansion-item>
+    <q-expansion-item
+        expand-separator
+        label="Upload Excel File"
+        dense
+    >
+      <span>{{ (selectedFile?.name || '') }}</span>
+      <q-input
+          @update:model-value="updateFile"
+          outlined
+          type="file"
+          hint="Excel Report"
+          class="q-ma-md"
+      />
+      <q-btn
+          :disable="!isDataValid"
+          color="primary"
+          label="Submit"
+          @click="submit"
+          glossy
+          class="q-mx-md q-my-xs"
+      />
+    </q-expansion-item>
 
-      <q-expansion-item
-          expand-separator
+    <q-expansion-item
+        expand-separator
+        label="Select Dataset"
+        dense
+    >
+      <span class="q-mx-md">Data Loaded::{{ dataFileNameLoaded }}</span>
+      <span v-if="!dataFileNameLoaded" class="q-mx-md text-negative text-bold">No Data Loaded!!</span>
+      <q-select :options="availableData" v-model="selectedDataFile" outlined hint="Select Data" class="q-ma-md"
+
+
+      >
+        <template v-slot:after>
+          <q-btn round dense flat icon="refresh" @click="getAvailableData"/>
+        </template>
+
+      </q-select>
+      <q-btn
+          color="primary"
+          glossy
           label="Load Data"
-          dense
-      >
-        <span class="q-mx-md">Data Loaded::{{dataFileNameLoaded}}</span>
-        <span v-if="!dataFileNameLoaded" class="q-mx-md text-negative text-bold">No Data Loaded!!</span>
-        <q-select :options="availableData" v-model="selectedDataFile" outlined hint="Select Data" class="q-ma-md"
-
-
-        >
-          <template v-slot:after>
-            <q-btn round dense flat icon="refresh" @click="getAvailableData"  />
-          </template>
-
-        </q-select>
-        <q-btn
-            color="primary"
-            glossy
-            label="Load Data"
-            @click="downloadData"
-            class="q-mx-md q-my-xs"
-        />
-      </q-expansion-item>
+          @click="downloadData"
+          class="q-mx-md q-my-xs"
+      />
+    </q-expansion-item>
   </div>
 </template>
 <script>
@@ -60,7 +60,7 @@ import {
   expectedHeadersCluster,
   expectedHeadersDistrict,
   finalHeadersCluster,
-  finalHeadersDistrict
+  finalHeadersDistrict, finalHeadersLocalCouncil, sheetDetails
 } from "@/settings/constants.js";
 import {storeToRefs} from "pinia";
 
@@ -104,50 +104,59 @@ export default {
 
     const finalDataDistrict = ref([]);
     const finalDataCluster = ref([]);
+    const finalDataLocalCouncil = ref([]);
+
     const isDataValid = computed(() => {
-      return selectedFile.value !== null && finalDataDistrict.value.length > 0 && finalDataCluster.value.length > 0;
+      return (selectedFile.value !== null &&
+          finalDataDistrict.value.length > 0 &&
+          finalDataCluster.value.length > 0 &&
+          finalDataLocalCouncil.value.length > 0
+      );
     });
 
 
     watch(selectedFile, (excelFile) => {
-      readXlsxFile(excelFile, {sheet: 'District'}).then((rows) => {
-        const headers = rows.slice(0, 2);
-        console.log(headers);
-        if (!verifyHeaders(headers, expectedHeadersDistrict)) {
-          colorTrace("District headers are not as expected", 'red');
-          triggerNegative({
-            message: "District sheet headers are not as expected",
-            caption: "Please check the excel file"
+
+      if (excelFile === null) {
+        return;
+      }
+
+      Object.keys(sheetDetails).forEach(key => {
+        const {sheetName, expectedHeaders} = sheetDetails[key];
+
+        readXlsxFile(excelFile, {sheet: sheetName}).then((rows) => {
+          const headers = rows.slice(0, expectedHeaders.length);
+          console.log(headers);
+          if (!verifyHeaders(headers, expectedHeaders)) {
+            colorTrace(`${sheetName} headers are not as expected`, 'red');
+            triggerNegative({
+              message: `${sheetName} sheet headers are not as expected`,
+              caption: "Please check the excel file"
+            });
+            return;
+          }
+          switch (sheetName) {
+            case 'District':
+              finalDataDistrict.value = createFinalData(finalHeadersDistrict, rows.slice(expectedHeaders.length));
+              break;
+            case 'Cluster':
+              finalDataCluster.value = createFinalData(finalHeadersCluster, rows.slice(expectedHeaders.length));
+              break;
+            case 'Local council':
+              finalDataLocalCouncil.value = createFinalData(finalHeadersLocalCouncil, rows.slice(expectedHeaders.length));
+              break;
+          }
+
+          triggerPositive({
+            message: `Excel sheet ${sheetName} is valid`,
           });
-          return;
-        }
-        finalDataDistrict.value = createFinalData(finalHeadersDistrict, rows.slice(2));
-        triggerPositive({
-          message: "Excel sheet District is valid",
+
         });
+
+
       });
 
-      readXlsxFile(excelFile, {sheet: 'Cluster'}).then((rows) => {
-        const headers = rows.slice(0, 1);
-        if (!verifyHeaders(headers, expectedHeadersCluster)) {
-          colorTrace("Cluster headers are not as expected", 'red');
-          triggerNegative({
-            message: "Cluster sheet headers are not as expected",
-            caption: "Please check the excel file"
-          });
-          return;
-        }
-        finalDataCluster.value = createFinalData(finalHeadersCluster, rows.slice(1));
-        triggerPositive({
-          message: "Excel sheet Cluster is valid",
-        });
-      }).catch((error) => {
-        console.log(error);
-        triggerNegative({
-          message: "Excel File is not valid",
-          caption: "Please check the excel file"
-        });
-      });
+
     });
 
     const progressDataStore = useProgressDataStore();
@@ -157,6 +166,7 @@ export default {
       const finalResult = {
         districtData: finalDataDistrict.value,
         clusterData: finalDataCluster.value,
+        localCouncilData: finalDataLocalCouncil.value,
         metaData: {
           fileName: selectedFile.value.name,
           fileLastModified: selectedFile.value.lastModified,
@@ -166,8 +176,10 @@ export default {
         }
       };
 
-      apiUploadExcelData(finalResult).then((response) => {
-        if (response.success) {
+      apiUploadExcelData(finalResult).then((data) => {
+
+        console.log(data);
+        if (data.success) {
           progressData.value = {
             file: finalResult.metaData.fileName.toLowerCase().replace(' ', '_').split('.xlsx')[0],
             data: finalResult
@@ -211,10 +223,16 @@ export default {
       return progressDataStore.dataFileNameLoaded;
     });
 
+    watch(selectedFile, (f) => {
+          console.log(f);
+        }
+    );
+
     return {
       selectedFile,
       finalDataDistrict,
       finalDataCluster,
+      finalDataLocalCouncil,
       isDataValid,
       submit,
       updateFile,

@@ -15,6 +15,11 @@ export const useProgressDataStore = defineStore({
                 "Overall % Co-Loc",
                 "% Deployment (CME & above)"
             ],
+            localCouncil: [
+                "Overall progress",
+                "Overall % Co-Loc",
+                "% Deployment (CME & above)"
+            ]
         },
         selectedKpi: useStorage('selectedKpi', {
             cluster: "OA & OB",
@@ -24,6 +29,7 @@ export const useProgressDataStore = defineStore({
         availableTypesOfKpi: [
             {label: 'District', value: 'district'},
             {label: 'Cluster', value: 'cluster'},
+            {label: 'Local Council', value: 'localCouncil'},
         ],
         selectedDataFile: useStorage('selectedDataFile', null),
     }),

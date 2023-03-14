@@ -9,6 +9,7 @@ export const siteNameColumn = 'Site Name';
 export const systemIdColumn = 'Technology';
 export const clusterIdColumn = 'Cluster_ID';
 export const districtIdColumn = 'DISTRICT';
+export const localCouncilIdColumn = 'PBT_NAME';
 export const expectedHeadersDistrict = [
     [
         "District",
@@ -25,8 +26,33 @@ export const expectedHeadersDistrict = [
         "% Deployment\n(OA & OB)"
     ],
 ];
+export const expectedHeadersLocalCouncil = [
+    [
+        "Local council",
+        "Region",
+        "Overall progress",
+        null,
+        null
+    ],
+    [
+        null,
+        null,
+        "Overall\n% Co-Loc",
+        "% Deployment\n(CME & above)",
+        "% Deployment\n(OA & OB)"
+    ],
+];
 export const finalHeadersDistrict = [
     "District",
+    "Region",
+    "Overall progress",
+    "Overall % Co-Loc",
+    "% Deployment (CME & above)",
+    "% Deployment (OA & OB)"
+];
+
+export const finalHeadersLocalCouncil = [
+    "Local council",
     "Region",
     "Overall progress",
     "Overall % Co-Loc",
@@ -57,3 +83,31 @@ export const finalHeadersCluster = [
     "+TP App",
     "Launch clusters"
 ];
+
+export const sheetDetails = {
+    'district': {
+        'sheetName': 'District',
+        'expectedHeaders': expectedHeadersDistrict,
+    },
+    'local_council': {
+        'sheetName': 'Local council',
+        'expectedHeaders': expectedHeadersLocalCouncil,
+    },
+    'cluster': {
+        'sheetName': 'Cluster',
+        'expectedHeaders': expectedHeadersCluster,
+    }
+}
+
+export const getPolygonIdKey = (selectedTypeOfKpi) => {
+    switch (selectedTypeOfKpi) {
+        case 'cluster':
+            return 'Cluster';
+        case 'district':
+            return 'District';
+        case 'localCouncil':
+            return 'Local council';
+        default:
+            throw new Error('Invalid selectedTypeOfKpi');
+    }
+};

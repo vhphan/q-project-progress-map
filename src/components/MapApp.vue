@@ -17,7 +17,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-geosearch/dist/geosearch.css';
 import 'leaflet-easybutton';
 import {useMapStore} from "@/store/mapStore";
-import {clusterIdColumn, districtIdColumn, operator} from "@/settings/constants";
+import {clusterIdColumn, districtIdColumn, getPolygonIdKey, localCouncilIdColumn, operator} from "@/settings/constants";
 import {useMainStore} from "@/store/mainStore";
 import {storeToRefs} from "pinia";
 import {addSearch, addSizeSelector, loadBasicMap, makeSiteLayers} from "@/composables/basicMap";
@@ -27,6 +27,7 @@ import {NODE_URL} from "@/plugins/http";
 import {BASE_URL_NODE} from "@/plugins/http";
 import {useProgressDataStore} from "@/store/progressDataStore.js";
 import {useCosmeticStore} from "@/store/cosmeticStore.js";
+import {triggerNegative} from "@/utils/notifications.js";
 
 
 export default {
@@ -87,6 +88,12 @@ export default {
         'fillOpacity': polygonLayerOpacity.value,
         'fillColor': '#ffffff'
       },
+      'local_council': {
+        'color': '#06b5c5',
+        'weight': 0.5,
+        'fillOpacity': polygonLayerOpacity.value,
+        'fillColor': '#ffffff'
+      },
       'hidden': {
         'color': '#ffffff',
         'weight': 0,
@@ -107,7 +114,12 @@ export default {
           label: 'district',
           url: `${BASE_URL_NODE}/polygons?file=districts&api=${apiKey}`,
           ...polygonsStyles['district']
-        }
+        },
+        {
+          label: 'localCouncil',
+          url: `${BASE_URL_NODE}/polygons?file=local_councils&api=${apiKey}`,
+          ...polygonsStyles['local_council']
+        },
       ];
 
       const clusterClickCallBack = function (e) {
@@ -237,10 +249,41 @@ export default {
     };
 
 
+    const getPolygonData = () => {
+      let key;
+      switch (selectedTypeOfKpi.value) {
+        case 'cluster':
+          key = 'clusterData';
+          break;
+        case 'district':
+          key = 'districtData';
+          break;
+        case 'localCouncil':
+          key = 'localCouncilData';
+          break;
+        default:
+          throw new Error('Unknown type of KPI');
+      }
+      if (!key || !progressData.value[key]) {
+        triggerNegative({
+          message: `No data for selected KPI Type ${selectedTypeOfKpi.value}`,
+        })
+        triggerNegative({
+          message: `Dataset Loaded is ${progressDataStore.dataFileNameLoaded}. Try another dataset!`,
+        })
+      }
+      return progressData.value[key];
+    };
+
+
+    function getSinglePolygonData(data, polygonIdKey, polygonId) {
+        return data.find((row) => row[polygonIdKey] === polygonId);
+    }
+
     const getAdditionalPopUp = (polygonId) => {
-      const polygonIdKey = selectedTypeOfKpi.value === 'cluster' ? 'Cluster' : 'District';
-      const data = selectedTypeOfKpi.value === 'cluster' ? progressData.value.clusterData : progressData.value.districtData;
-      const polygonData = data.find((row) => row[polygonIdKey] === polygonId);
+      const polygonIdKey = getPolygonIdKey(selectedTypeOfKpi.value);
+      const data = getPolygonData();
+      const polygonData = getSinglePolygonData(data, polygonIdKey, polygonId);
       if (polygonData) {
         return `<b>${selectedKpi.value[selectedTypeOfKpi.value]}</b>: ${polygonData[selectedKpi.value[selectedTypeOfKpi.value]]}<br>`;
       }
@@ -251,10 +294,13 @@ export default {
 
     function getStyle(layer, polygonIdColumn) {
       const polygonId = layer.feature.properties[polygonIdColumn];
-      const polygonIdKey = selectedTypeOfKpi.value === 'cluster' ? 'Cluster' : 'District';
-      const data = selectedTypeOfKpi.value === 'cluster' ? progressData.value.clusterData : progressData.value.districtData;
-      const polygonData = data.find((row) => row[polygonIdKey] === polygonId);
-      console.log('getting style');
+      // const polygonIdKey = selectedTypeOfKpi.value === 'cluster' ? 'Cluster' : 'District';
+      // const data = selectedTypeOfKpi.value === 'cluster' ? progressData.value.clusterData : progressData.value.districtData;
+
+      const polygonIdKey = getPolygonIdKey(selectedTypeOfKpi.value);
+      const data = getPolygonData();
+
+      const polygonData = getSinglePolygonData(data, polygonIdKey, polygonId);
       if (!polygonData) {
         return polygonsStyles[selectedTypeOfKpi.value];
       }
@@ -283,7 +329,23 @@ export default {
         await progressDataStore.queryProgressData();
         // $q.loading.hide();
       }
-      const polygonIdColumn = selectedTypeOfKpi.value === 'cluster' ? clusterIdColumn : districtIdColumn;
+      // const polygonIdColumn = selectedTypeOfKpi.value === 'cluster' ? clusterIdColumn : districtIdColumn;
+
+      let polygonIdColumn;
+      switch (selectedTypeOfKpi.value) {
+        case 'cluster':
+          polygonIdColumn = clusterIdColumn;
+          break;
+        case 'district':
+          polygonIdColumn = districtIdColumn;
+          break;
+        case 'localCouncil':
+          polygonIdColumn = localCouncilIdColumn;
+          break;
+        default:
+          throw new Error('Invalid selectedTypeOfKpi');
+      }
+
       mapObj.layerGroups[selectedTypeOfKpi.value].eachLayer((layer) => {
 
         let html = '';

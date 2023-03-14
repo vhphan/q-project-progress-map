@@ -138,11 +138,9 @@ export default {
             }
           }
           // for (let i = customRanges.value.length; i > 0; i--) {
-          //   // debugger;
           //   if (i - 1 > 0 && customRanges.value[i] <= customRanges.value[i - 1]) {
           //
           //     console.log(customRanges.value[i - 1], customRanges.value[i], i)
-          //     debugger;
           //     customRanges.value[i - 1] = parseFloat((Math.max(customRanges.value[i] - 0.01, 0)).toFixed(2));
           //   }
           // }

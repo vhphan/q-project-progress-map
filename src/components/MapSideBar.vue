@@ -5,22 +5,22 @@
         icon="map"
         label="Map settings"
         group="some-group"
-    >
-      Regions (<span class="text-bold">Sites</span> displayed):
+    ><q-card class="my-card q-pa-xs">
+      <span class="text-bold" style="font-size: 1rem;">REGION: Sites Displayed ONLY</span>:
       <q-select
           :options="availableRegions"
           v-model="selectedRegion"
           outlined
           style="border-color: #0d47a1;"
       />
-
+    </q-card>
 
     </q-expansion-item>
 
     <q-expansion-item
         expand-separator
         icon="analytics"
-        label="KPI settings"
+        label="KPI data"
         group="some-group"
     >
       <excel-file-selector/>
