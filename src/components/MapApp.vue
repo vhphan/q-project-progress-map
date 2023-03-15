@@ -17,14 +17,21 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-geosearch/dist/geosearch.css';
 import 'leaflet-easybutton';
 import {useMapStore} from "@/store/mapStore";
-import {clusterIdColumn, districtIdColumn, getPolygonIdKey, localCouncilIdColumn, operator} from "@/settings/constants";
+import {
+  clusterIdColumn,
+  districtIdColumn,
+  getPolygonIdKey,
+  localCouncilIdColumn,
+  operator,
+  polygonDisplayNames,
+  polygonIdKeyInGeoJSON
+} from "@/settings/constants";
 import {useMainStore} from "@/store/mainStore";
 import {storeToRefs} from "pinia";
 import {addSearch, addSizeSelector, loadBasicMap, makeSiteLayers} from "@/composables/basicMap";
 import {debounce} from "quasar";
 import {getCookie, loadScript, titleCase} from "@/utils/myFunctions";
-import {NODE_URL} from "@/plugins/http";
-import {BASE_URL_NODE} from "@/plugins/http";
+import {BASE_URL_NODE, NODE_URL} from "@/plugins/http";
 import {useProgressDataStore} from "@/store/progressDataStore.js";
 import {useCosmeticStore} from "@/store/cosmeticStore.js";
 import {triggerNegative} from "@/utils/notifications.js";
@@ -43,6 +50,7 @@ export default {
       lControl: null,
       ctlTree: null,
       layerGroups: {},
+      markerGroups: {},
       myFeatureGroup: null,
       searchControl: null,
       legend: null,
@@ -74,33 +82,7 @@ export default {
       ));
     };
     const {setupLeafletMap, mapResize, mapContainer} = loadBasicMap(mapObj);
-
-    const polygonsStyles = {
-      'cluster': {
-        'color': 'rgba(152,119,127,0.85)',
-        'weight': 1.5,
-        'fillOpacity': polygonLayerOpacity.value,
-        'fillColor': '#ffffff'
-      },
-      'district': {
-        'color': '#06c506',
-        'weight': 0.5,
-        'fillOpacity': polygonLayerOpacity.value,
-        'fillColor': '#ffffff'
-      },
-      'local_council': {
-        'color': '#06b5c5',
-        'weight': 0.5,
-        'fillOpacity': polygonLayerOpacity.value,
-        'fillColor': '#ffffff'
-      },
-      'hidden': {
-        'color': '#ffffff',
-        'weight': 0,
-        'fillOpacity': 0,
-        'fillColor': '#ffffff'
-      }
-    };
+    const {polygonsStyles} = storeToRefs(mapStore);
 
     function createLayerGroups() {
 
@@ -108,17 +90,20 @@ export default {
         {
           label: 'cluster',
           url: `${BASE_URL_NODE}/polygons?file=clusters&api=${apiKey}`,
-          ...polygonsStyles['cluster']
+          ...polygonsStyles.value['cluster'],
+          markers: null,
         },
         {
           label: 'district',
           url: `${BASE_URL_NODE}/polygons?file=districts&api=${apiKey}`,
-          ...polygonsStyles['district']
+          ...polygonsStyles.value['district'],
+          markers: null,
         },
         {
           label: 'localCouncil',
           url: `${BASE_URL_NODE}/polygons?file=local_councils&api=${apiKey}`,
-          ...polygonsStyles['local_council']
+          ...polygonsStyles.value['localCouncil'],
+          markers: null,
         },
       ];
 
@@ -141,7 +126,6 @@ export default {
       if ('clusters' in layerGroups) {
         layerGroups['clusters'].bringToBack();
       }
-
     }
 
     const addSiteLayers = () => {
@@ -267,17 +251,17 @@ export default {
       if (!key || !progressData.value[key]) {
         triggerNegative({
           message: `No data for selected KPI Type ${selectedTypeOfKpi.value}`,
-        })
+        });
         triggerNegative({
           message: `Dataset Loaded is ${progressDataStore.dataFileNameLoaded}. Try another dataset!`,
-        })
+        });
       }
       return progressData.value[key];
     };
 
 
     function getSinglePolygonData(data, polygonIdKey, polygonId) {
-        return data.find((row) => row[polygonIdKey] === polygonId);
+      return data.find((row) => row[polygonIdKey] === polygonId);
     }
 
     const getAdditionalPopUp = (polygonId) => {
@@ -285,7 +269,9 @@ export default {
       const data = getPolygonData();
       const polygonData = getSinglePolygonData(data, polygonIdKey, polygonId);
       if (polygonData) {
-        return `<b>${selectedKpi.value[selectedTypeOfKpi.value]}</b>: ${polygonData[selectedKpi.value[selectedTypeOfKpi.value]]}<br>`;
+        const kpiValue = polygonData[selectedKpi.value[selectedTypeOfKpi.value]]
+        let kpiText = isNaN(+kpiValue) ? '' : (parseFloat(kpiValue) * 100).toFixed(0) + '%';
+        return `<b>${selectedKpi.value[selectedTypeOfKpi.value]}</b>: ${kpiText}<br>`;
       }
       return '';
     };
@@ -310,7 +296,7 @@ export default {
 
       return {
         fillColor: getColor(polygonData),
-        weight: 0.1,
+        weight: 1,
         color: '#a6a6a6',
         fillOpacity: polygonLayerOpacity.value,
       };
@@ -404,6 +390,58 @@ export default {
       changePolygonOpacity();
     });
 
+    const {polygonLabels} = mapStore;
+    let oldLabels = {...polygonLabels};
+
+
+    watch(polygonLabels, (newValue, oldValue) => {
+      for (const [key, value] of Object.entries(polygonLabels)) {
+        if (value && !oldLabels[key]) {
+
+          let markers = [];
+          mapObj.layerGroups[key].eachLayer((layer) => {
+
+            const polygonCenter = layer.getBounds().getCenter();
+            let geoProperties = layer.feature.properties;
+            let labelText = geoProperties[polygonDisplayNames[key]];
+            let data = progressData.value[key + 'Data'];
+            let kpiText = '';
+            try {
+              let foundData = data.find((row) => row[getPolygonIdKey(key)] === geoProperties[polygonIdKeyInGeoJSON[key]]);
+
+              if (data && foundData) {
+                let kpiValue = foundData[selectedKpi.value[key]];
+                kpiText =  isNaN(+kpiValue) ? '' : (parseFloat(kpiValue) * 100).toFixed(0) + '%';
+                kpiText = ': ' + kpiText;
+              }
+
+              let marker = L.circleMarker(polygonCenter, {
+                radius: 10,
+                color: '#003cff',
+                fillColor: '#fff',
+                fillOpacity: 1,
+                weight: 1,
+              }).bindTooltip(labelText + kpiText, {
+                permanent: true,
+                direction: 'center',
+                className: 'polygon-label',
+              });
+              markers.push(marker);
+            } catch (e) {
+              console.log(e);
+            }
+          });
+          mapObj.markerGroups[key] = L.layerGroup(markers);
+          mapObj.markerGroups[key].addTo(mapObj.map);
+
+        }
+        if (!value && mapObj.markerGroups[key]) {
+          mapObj.map.removeLayer(mapObj.markerGroups[key]);
+        }
+      }
+      oldLabels = {...newValue};
+    }, {deep: true});
+
 
     return {
       mapObjReactive,
@@ -416,6 +454,8 @@ export default {
 
 </script>
 
-<style scoped>
-
+<style>
+.polygons-label {
+  min-width: 100px;
+}
 </style>

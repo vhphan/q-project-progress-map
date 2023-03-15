@@ -89,7 +89,7 @@ export const sheetDetails = {
         'sheetName': 'District',
         'expectedHeaders': expectedHeadersDistrict,
     },
-    'local_council': {
+    'localCouncil': {
         'sheetName': 'Local council',
         'expectedHeaders': expectedHeadersLocalCouncil,
     },
@@ -97,17 +97,34 @@ export const sheetDetails = {
         'sheetName': 'Cluster',
         'expectedHeaders': expectedHeadersCluster,
     }
-}
+};
 
 export const getPolygonIdKey = (selectedTypeOfKpi) => {
-    switch (selectedTypeOfKpi) {
-        case 'cluster':
-            return 'Cluster';
-        case 'district':
-            return 'District';
-        case 'localCouncil':
-            return 'Local council';
-        default:
-            throw new Error('Invalid selectedTypeOfKpi');
-    }
+    // switch (selectedTypeOfKpi) {
+    //     case 'cluster':
+    //         return 'Cluster';
+    //     case 'district':
+    //         return 'District';
+    //     case 'localCouncil':
+    //         return 'Local council';
+    //     default:
+    //         throw new Error('Invalid selectedTypeOfKpi');
+    // }
+
+    return {
+        'cluster': 'Cluster',
+        'district': 'District',
+        'localCouncil': 'Local council',
+    }[selectedTypeOfKpi];
+};
+
+export const polygonDisplayNames = {
+    'cluster': 'Cluster_ID',
+    'district': 'DISTRICT',
+    'localCouncil': 'SINGKATAN',
+};
+export const polygonIdKeyInGeoJSON = {
+    'cluster': 'Cluster_ID',
+    'district': 'DISTRICT',
+    'localCouncil': 'PBT_NAME',
 };

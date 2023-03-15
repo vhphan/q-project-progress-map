@@ -379,6 +379,7 @@ function makeSiteLayers({
     };
 
     otherPolygonLayers.forEach(polygonLayer => {
+
         let layer = new L.GeoJSON.AJAX(polygonLayer.url, {
             onEachFeature: (feature, layer) => {
                 if (callbackForPolygonLayer) {
@@ -393,6 +394,7 @@ function makeSiteLayers({
                 }
                 layer.bindPopup(html);
 
+
             },
             style: function (feature) {
                 return {
@@ -403,11 +405,11 @@ function makeSiteLayers({
                 };
             }
         });
+        layerGroups[polygonLayer.label] = layer;
         masterGroupChildrenOtherLayers.push({
             label: polygonLayer.label,
             layer,
         });
-        layerGroups[polygonLayer.label] = layer;
 
         setTimeout(() => {
             layer.bringToBack();
@@ -552,5 +554,17 @@ function addSizeSelector({map, sectorSize, refreshFunc}) {
     });
 }
 
+function addMarkersToPolygons(polygonLayer, markerOptions, statsData, otherOptions = {}) {
+    const {} = otherOptions;
+    polygonLayer.eachLayer(function (layer) {
+        const marker = L.circleMarker(layer.getBounds().getCenter(), markerOptions);
+        let html = '';
+        for (const [key, value] of Object.entries(layer.feature.properties)) {
+            if (value) {
+                html += `<b>${key}</b>: ${value}<br>`;
+            }
+        }
+    });
+}
 
 export {loadBasicMap, makeSiteLayers, removeMap, addSearch, addSizeSelector,};

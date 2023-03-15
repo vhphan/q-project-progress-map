@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-blue-1">
+  <q-card class="bg-blue-1 my-card">
     <q-expansion-item
         expand-separator
         label="Upload Excel File"
@@ -47,7 +47,7 @@
           class="q-mx-md q-my-xs"
       />
     </q-expansion-item>
-  </div>
+  </q-card>
 </template>
 <script>
 import {computed, onMounted, ref, watch} from "vue";

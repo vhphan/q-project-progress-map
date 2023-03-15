@@ -2,18 +2,20 @@
   <div class="q-pa-xs">
     <q-expansion-item
         expand-separator
-        icon="map"
-        label="Map settings"
+        icon="edit_location"
+        label="Sites Display"
         group="some-group"
-    ><q-card class="my-card q-pa-xs">
-      <span class="text-bold" style="font-size: 1rem;">REGION: Sites Displayed ONLY</span>:
-      <q-select
-          :options="availableRegions"
-          v-model="selectedRegion"
-          outlined
-          style="border-color: #0d47a1;"
-      />
-    </q-card>
+        class="my-menu"
+    >
+      <q-card class="my-card q-pa-xs">
+        <span class="text-bold" style="font-size: 1rem;">REGION: Sites Displayed ONLY</span>:
+        <q-select
+            :options="availableRegions"
+            v-model="selectedRegion"
+            outlined
+            style="border-color: #0d47a1;"
+        />
+      </q-card>
 
     </q-expansion-item>
 
@@ -22,16 +24,17 @@
         icon="analytics"
         label="KPI data"
         group="some-group"
+        class="my-menu"
+
     >
       <excel-file-selector/>
-
     </q-expansion-item>
     <q-expansion-item
         expand-separator
         icon="palette"
         label="Legend Colors"
         group="some-group"
-
+        class="my-menu"
     >
       <q-card class="my-card">
         <q-select
@@ -42,7 +45,7 @@
             style="border-color: #0d47a1;"
             label="Filter Region to Display"
         />
-        <q-separator />
+        <q-separator/>
         <q-option-group
             type="radio"
             inline
@@ -113,9 +116,10 @@
         icon="insights"
         label="Select KPI"
         group="some-group"
+        class="my-menu"
     >
       <q-card
-          bordered
+          class="my-card"
       >
         <q-card-section>
           <q-option-group
@@ -155,8 +159,16 @@
         />
 
       </q-card>
+    </q-expansion-item>
 
-
+    <q-expansion-item
+        expand-separator
+        icon="label"
+        label="Label Polygon"
+        group="some-group"
+        class="my-menu"
+    >
+      <polygon-labels/>
     </q-expansion-item>
 
 
@@ -171,10 +183,12 @@ import ExcelFileSelector from "@/components/ExcelFileSelector.vue";
 import {useCosmeticStore} from "@/store/cosmeticStore.js";
 import {useProgressDataStore} from "@/store/progressDataStore.js";
 import CustomColorRange from "@/components/CustomColorRange.vue";
+import PolygonLabeller from "@/components/PolygonLabels.vue";
+import PolygonLabels from "@/components/PolygonLabels.vue";
 
 export default {
   name: "MapSideBar",
-  components: {CustomColorRange, ExcelFileSelector},
+  components: {PolygonLabels, PolygonLabeller, CustomColorRange, ExcelFileSelector},
   setup() {
     const mapStore = useMapStore();
     const {region, regions} = storeToRefs(mapStore);

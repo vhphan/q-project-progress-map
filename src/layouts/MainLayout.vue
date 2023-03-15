@@ -8,18 +8,16 @@
         <q-toolbar-title
             shrink
         >
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" alt="logo">
-          </q-avatar>
           Project Dashboard
         </q-toolbar-title>
-        <span class="text-h5 text-bold" style="text-decoration: underline;">{{mapTitle}}</span>
 
         <q-tabs align="left" class="q-ml-md">
           <q-route-tab :to="`${basePath}page1`" label="Page One"/>
           <q-route-tab :to="`${basePath}about`" label="About"/>
 <!--          <q-route-tab :to="`${basePath}page3`" label="Page Three"/>-->
         </q-tabs>
+        <q-space/>
+        <span class="text-h5 text-bold" style="text-decoration: underline;">{{mapTitle}}</span>
         <q-space/>
       </q-toolbar>
 

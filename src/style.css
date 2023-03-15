@@ -1,7 +1,14 @@
 
 .my-card {
 
-    border: #003cff 2px solid;
+    border: #8400ff 0.1rem solid;
+    margin-top: 2px;
+
+}
+
+.my-menu {
+
+    border: #9a767a 1px solid;
     margin-top: 2px;
 
 }

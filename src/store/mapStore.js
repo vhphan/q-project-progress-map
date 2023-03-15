@@ -78,6 +78,11 @@ export const useMapStore = defineStore('map', {
             redrawKpiLayer: false,
             mapTitle: '',
             resetPolygonsStylesTriggered: false,
+            polygonLabels: {
+                'cluster': false,
+                'district': false,
+                'localCouncil': false,
+            },
 
         };
     },
@@ -90,6 +95,32 @@ export const useMapStore = defineStore('map', {
                 };
             });
         },
+        polygonsStyles: ({polygonLayerOpacity}) => ({
+            'cluster': {
+                'color': 'rgba(152,119,127,0.85)',
+                'weight': 1.5,
+                'fillOpacity': polygonLayerOpacity,
+                'fillColor': '#ffffff'
+            },
+            'district': {
+                'color': '#06c506',
+                'weight': 0.5,
+                'fillOpacity': polygonLayerOpacity,
+                'fillColor': '#ffffff'
+            },
+            'localCouncil': {
+                'color': '#06b5c5',
+                'weight': 0.5,
+                'fillOpacity': polygonLayerOpacity,
+                'fillColor': '#ffffff'
+            },
+            'hidden': {
+                'color': '#ffffff',
+                'weight': 0,
+                'fillOpacity': 0,
+                'fillColor': '#ffffff'
+            }
+        })
     },
     actions: {
         redraw: function () {
