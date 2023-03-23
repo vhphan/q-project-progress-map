@@ -269,7 +269,7 @@ export default {
       const data = getPolygonData();
       const polygonData = getSinglePolygonData(data, polygonIdKey, polygonId);
       if (polygonData) {
-        const kpiValue = polygonData[selectedKpi.value[selectedTypeOfKpi.value]]
+        const kpiValue = polygonData[selectedKpi.value[selectedTypeOfKpi.value]];
         let kpiText = isNaN(+kpiValue) ? '' : (parseFloat(kpiValue) * 100).toFixed(0) + '%';
         return `<b>${selectedKpi.value[selectedTypeOfKpi.value]}</b>: ${kpiText}<br>`;
       }
@@ -355,6 +355,28 @@ export default {
 
     const {selectedRegionPolygon} = storeToRefs(cosmeticStore);
 
+    watch(selectedRegionPolygon, (newValue) => {
+
+      Object.keys(polygonLabels).forEach((key) => {
+
+        mapObj.layerGroups[key].eachLayer((layer) => {
+              if (layer.feature.properties.Region !== newValue) {
+                layer.setStyle({
+                  ...polygonsStyles.hidden,
+                });
+              } else {
+                layer.setStyle({
+                  ...polygonsStyles[key],
+                });
+              }
+            }
+        );
+
+
+      });
+
+    });
+
     const resetPolygonLayersStyles = () => {
       polygonLayerOpacity.value = 0.1;
       mapObj.layerGroups.cluster.eachLayer((layer) => {
@@ -378,12 +400,19 @@ export default {
     });
 
     const changePolygonOpacity = debounce(() => {
-      mapObj.layerGroups.cluster.setStyle({
-        fillOpacity: polygonLayerOpacity.value,
-      });
-      mapObj.layerGroups.district.setStyle({
-        fillOpacity: polygonLayerOpacity.value,
-      });
+
+      const {polygonLabels} = mapStore;
+
+      Object.keys(polygonLabels).forEach((key) => {
+            if (polygonLabels[key]) {
+              mapObj.layerGroups[key].eachLayer((layer) => {
+                layer.setStyle({
+                  fillOpacity: polygonLayerOpacity.value
+                });
+              });
+            }
+          }
+      );
     }, 800);
 
     watch(polygonLayerOpacity, () => {
@@ -411,7 +440,7 @@ export default {
 
               if (data && foundData) {
                 let kpiValue = foundData[selectedKpi.value[key]];
-                kpiText =  isNaN(+kpiValue) ? '' : (parseFloat(kpiValue) * 100).toFixed(0) + '%';
+                kpiText = isNaN(+kpiValue) ? '' : (parseFloat(kpiValue) * 100).toFixed(0) + '%';
                 kpiText = ': ' + kpiText;
               }
 

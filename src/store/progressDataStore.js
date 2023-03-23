@@ -18,7 +18,8 @@ export const useProgressDataStore = defineStore({
             localCouncil: [
                 "Overall progress",
                 "Overall % Co-Loc",
-                "% Deployment (CME & above)"
+                "% Deployment (CME & above)",
+                "% Deployment (OA & OB)",
             ]
         },
         selectedKpi: useStorage('selectedKpi', {

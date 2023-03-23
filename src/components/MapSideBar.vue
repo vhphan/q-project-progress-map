@@ -1,19 +1,31 @@
 <template>
   <div class="q-pa-xs">
+
     <q-expansion-item
         expand-separator
         icon="edit_location"
-        label="Sites Display"
+        label="Region Filter"
         group="some-group"
         class="my-menu"
     >
       <q-card class="my-card q-pa-xs">
-        <span class="text-bold" style="font-size: 1rem;">REGION: Sites Displayed ONLY</span>:
+        <span class="text-bold" style="font-size: 1rem;">REGION: SITES</span>:
         <q-select
             :options="availableRegions"
             v-model="selectedRegion"
             outlined
             style="border-color: #0d47a1;"
+        />
+
+        <q-separator/>
+        <span class="text-bold" style="font-size: 1rem;">REGION: POLYGONS </span>:
+        <q-select
+            class="q-ma-xs"
+            :options="[...availableRegions, 'ALL']"
+            v-model="selectedRegionPolygon"
+            outlined
+            style="border-color: #0d47a1;"
+            label="Filter Region to Display"
         />
       </q-card>
 
@@ -37,15 +49,7 @@
         class="my-menu"
     >
       <q-card class="my-card">
-        <q-select
-            class="q-ma-xs"
-            :options="[...availableRegions, 'ALL']"
-            v-model="selectedRegionPolygon"
-            outlined
-            style="border-color: #0d47a1;"
-            label="Filter Region to Display"
-        />
-        <q-separator/>
+
         <q-option-group
             type="radio"
             inline

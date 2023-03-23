@@ -2,7 +2,7 @@ export const operator = 'dnb';
 export const techLayers = ['N3', 'L7'];
 export const basePath = '/app/project-progress-map/';
 export const authLoginUrl = 'https://ndo-portal.eprojecttrackers.com/login2.php?action=projectProgressMap';
-export const regions = ['CENTRAL', 'EASTERN', 'SABAH', 'SARAWAK', 'SOUTHERN'];
+export const regions = ['CENTRAL', 'EASTERN', 'SABAH', 'SARAWAK', 'SOUTHERN', 'NORTHERN'];
 
 export const cellNameColumn = 'Cell Name';
 export const siteNameColumn = 'Site Name';
