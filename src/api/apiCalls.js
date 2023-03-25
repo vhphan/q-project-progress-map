@@ -29,7 +29,13 @@ export const apiGetProgressData = async (params = {}) => {
             message: 'Fetching data...',
         }
     );
-    const response = (await apiNode.get(`/getProgressData`, {params})).data;
-    Loading.hide();
-    return response.data;
+    try {
+        const response = (await apiNode.get(`/getProgressData`, {params})).data;
+        return response.data;
+    } catch (e) {
+        console.log(e);
+        return [];
+    } finally {
+        Loading.hide();
+    }
 };

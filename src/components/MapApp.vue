@@ -84,7 +84,7 @@ export default {
     const {setupLeafletMap, mapResize, mapContainer} = loadBasicMap(mapObj);
     const {polygonsStyles} = storeToRefs(mapStore);
 
-    function createLayerGroups() {
+    const createLayerGroups = () => {
 
       const otherPolygonLayers = [
         {
@@ -126,7 +126,7 @@ export default {
       if ('clusters' in layerGroups) {
         layerGroups['clusters'].bringToBack();
       }
-    }
+    };
 
     const addSiteLayers = () => {
       Object.keys(mapObj.layerGroups).forEach(techLayer => {
@@ -137,17 +137,17 @@ export default {
       });
     };
 
-    function updateLayers() {
+    const updateLayers = () => {
       techLayers.value.forEach((techLayer) => {
         const url = `${NODE_URL}/geojson?stats=1&region=${region.value}&system=${techLayer}&size=${sectorSize.value}&api=${apiKey}`;
         mapObj.layerGroups[techLayer].getLayers()[0].refresh(url);
       });
-    }
+    };
 
-    function refreshLayersWithNewSize(newSectorSize) {
+    const refreshLayersWithNewSize = newSectorSize => {
       sectorSize.value = newSectorSize;
       updateLayers();
-    }
+    };
 
     const saveMapPosition = function () {
       const saveToStore = function (e) {
@@ -162,7 +162,7 @@ export default {
       mapObj.map.on('moveend', saveToStore);
     };
 
-    function makeMapCallBack() {
+    const makeMapCallBack = () => {
       // setupLeafletMap('Google Roadmap');
       setupLeafletMap('Positron (CartoDB)');
       saveMapPosition();
@@ -171,9 +171,15 @@ export default {
       addSearch(mapObj);
       window.map = mapObj.map;
       addSizeSelector({map: mapObj.map, sectorSize: sectorSize.value, refreshFunc: refreshLayersWithNewSize});
-    }
+
+      setTimeout(() => {
+        filterPolygonsByRegion(selectedRegionPolygon.value);
+      }, 5000);
+
+    };
 
     const toolbarHeight = computed(() => document.getElementById('toolbar')?.offsetHeight || 60);
+
     const adjustMapHeight = debounce(function () {
       if (!document.getElementById(mapObj.id)) {
         return;
@@ -184,22 +190,9 @@ export default {
       }
     }, 500);
 
-    watch(toolbarHeight, (newHeight, oldHeight) => {
-      adjustMapHeight();
-    });
-
     window.onresize = debounce(() => {
       adjustMapHeight();
     }, 1500);
-
-    function makeMap() {
-      if (window.google) {
-        makeMapCallBack();
-        return;
-      }
-      loadScript(`https://api.eprojecttrackers.com/node/${operator}/googleMap?api=${apiKey}`,
-          'google', makeMapCallBack);
-    }
 
     onMounted(() => {
       setTimeout(() => {
@@ -210,19 +203,19 @@ export default {
       }, 500);
     });
 
-    watch(region, (newRegion, oldRegion) => {
-      if (newRegion === oldRegion) return;
-      mapObj.map.setView(mapStore.centers[newRegion], mapStore.defaultZoom);
-      updateLayers();
-    });
-
-
     const progressDataStore = useProgressDataStore();
     const {progressData, selectedKpi, selectedTypeOfKpi} = storeToRefs(progressDataStore);
     const {redrawKpiLayer, mapTitle} = storeToRefs(mapStore);
     const cosmeticStore = useCosmeticStore();
 
-
+    const makeMap = () => {
+      if (window.google) {
+        makeMapCallBack();
+        return;
+      }
+      loadScript(`https://api.eprojecttrackers.com/node/${operator}/googleMap?api=${apiKey}`,
+          'google', makeMapCallBack);
+    };
     const getColor = (polygonData) => {
       if (polygonData) {
         const colorFunc = cosmeticStore.getColorScaleByMethod();
@@ -231,8 +224,6 @@ export default {
       }
       return '#ffffff';
     };
-
-
     const getPolygonData = () => {
       let key;
       switch (selectedTypeOfKpi.value) {
@@ -258,12 +249,7 @@ export default {
       }
       return progressData.value[key];
     };
-
-
-    function getSinglePolygonData(data, polygonIdKey, polygonId) {
-      return data.find((row) => row[polygonIdKey] === polygonId);
-    }
-
+    const getSinglePolygonData = (data, polygonIdKey, polygonId) => data.find((row) => row[polygonIdKey] === polygonId);
     const getAdditionalPopUp = (polygonId) => {
       const polygonIdKey = getPolygonIdKey(selectedTypeOfKpi.value);
       const data = getPolygonData();
@@ -275,10 +261,7 @@ export default {
       }
       return '';
     };
-
-    const {dataLoaded} = storeToRefs(progressDataStore);
-
-    function getStyle(layer, polygonIdColumn) {
+    const getStyle = (layer, polygonIdColumn) => {
       const polygonId = layer.feature.properties[polygonIdColumn];
       // const polygonIdKey = selectedTypeOfKpi.value === 'cluster' ? 'Cluster' : 'District';
       // const data = selectedTypeOfKpi.value === 'cluster' ? progressData.value.clusterData : progressData.value.districtData;
@@ -300,9 +283,53 @@ export default {
         color: '#a6a6a6',
         fillOpacity: polygonLayerOpacity.value,
       };
-    }
+    };
 
-// const $q = useQuasar();
+    const {dataLoaded} = storeToRefs(progressDataStore);
+    const {selectedRegionPolygon} = storeToRefs(cosmeticStore);
+    const {resetPolygonsStylesTriggered} = storeToRefs(mapStore);
+    const {polygonLabels} = mapStore;
+    let oldLabels = {...polygonLabels};
+
+    const resetPolygonLayersStyles = () => {
+      polygonLayerOpacity.value = 0.1;
+      mapObj.layerGroups.cluster.eachLayer((layer) => {
+        layer.setStyle({
+          ...polygonsStyles.cluster,
+        });
+      });
+      mapObj.layerGroups.district.eachLayer((layer) => {
+        layer.setStyle({
+          ...polygonsStyles.district,
+        });
+      });
+    };
+    const changePolygonOpacity = debounce(() => {
+
+      const {polygonLabels} = mapStore;
+
+      Object.keys(polygonLabels).forEach((key) => {
+            if (polygonLabels[key]) {
+              mapObj.layerGroups[key].eachLayer((layer) => {
+                layer.setStyle({
+                  fillOpacity: polygonLayerOpacity.value
+                });
+              });
+            }
+          }
+      );
+    }, 800);
+
+    watch(toolbarHeight, (newHeight, oldHeight) => {
+      adjustMapHeight();
+    });
+
+    watch(region, (newRegion, oldRegion) => {
+      if (newRegion === oldRegion) return;
+      mapObj.map.setView(mapStore.centers[newRegion], mapStore.defaultZoom);
+      updateLayers();
+    });
+
     watch(redrawKpiLayer, async (newValue) => {
       console.log('redrawKpiLayer triggered', newValue);
       if (!newValue) {
@@ -352,46 +379,35 @@ export default {
       redrawKpiLayer.value = false;
     });
 
-
-    const {selectedRegionPolygon} = storeToRefs(cosmeticStore);
-
-    watch(selectedRegionPolygon, (newValue) => {
+    function filterPolygonsByRegion(newValue) {
+      function getPolygonStyle(layer, key) {
+        if (newValue === 'ALL' || (newValue !== 'ALL' && layer.feature.properties.Region === newValue)) {
+          layer.setStyle({
+            ...polygonsStyles.value[key],
+          });
+          return;
+        }
+        layer.setStyle({
+          ...polygonsStyles.value.hidden,
+        });
+      }
 
       Object.keys(polygonLabels).forEach((key) => {
-
         mapObj.layerGroups[key].eachLayer((layer) => {
-              if (layer.feature.properties.Region !== newValue) {
-                layer.setStyle({
-                  ...polygonsStyles.hidden,
-                });
-              } else {
-                layer.setStyle({
-                  ...polygonsStyles[key],
-                });
-              }
+              getPolygonStyle(layer, key);
             }
         );
-
-
       });
+    }
 
+    watch(selectedRegionPolygon, (newValue) => {
+      filterPolygonsByRegion(newValue);
     });
 
-    const resetPolygonLayersStyles = () => {
-      polygonLayerOpacity.value = 0.1;
-      mapObj.layerGroups.cluster.eachLayer((layer) => {
-        layer.setStyle({
-          ...polygonsStyles.cluster,
-        });
-      });
-      mapObj.layerGroups.district.eachLayer((layer) => {
-        layer.setStyle({
-          ...polygonsStyles.district,
-        });
-      });
-    };
+    watch(()=>mapObj.map, (newValue) => {
+      console.log('mapObj.map changed', newValue);
+    });
 
-    const {resetPolygonsStylesTriggered} = storeToRefs(mapStore);
     watch(resetPolygonsStylesTriggered, (newValue) => {
       if (newValue) {
         resetPolygonLayersStyles();
@@ -399,29 +415,9 @@ export default {
       }
     });
 
-    const changePolygonOpacity = debounce(() => {
-
-      const {polygonLabels} = mapStore;
-
-      Object.keys(polygonLabels).forEach((key) => {
-            if (polygonLabels[key]) {
-              mapObj.layerGroups[key].eachLayer((layer) => {
-                layer.setStyle({
-                  fillOpacity: polygonLayerOpacity.value
-                });
-              });
-            }
-          }
-      );
-    }, 800);
-
     watch(polygonLayerOpacity, () => {
       changePolygonOpacity();
     });
-
-    const {polygonLabels} = mapStore;
-    let oldLabels = {...polygonLabels};
-
 
     watch(polygonLabels, (newValue, oldValue) => {
       for (const [key, value] of Object.entries(polygonLabels)) {
@@ -470,7 +466,6 @@ export default {
       }
       oldLabels = {...newValue};
     }, {deep: true});
-
 
     return {
       mapObjReactive,

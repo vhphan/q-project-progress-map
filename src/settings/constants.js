@@ -45,7 +45,6 @@ export const expectedHeadersLocalCouncil = [
 export const finalHeadersDistrict = [
     "District",
     "Region",
-    "Overall progress",
     "Overall % Co-Loc",
     "% Deployment (CME & above)",
     "% Deployment (OA & OB)"
@@ -54,7 +53,6 @@ export const finalHeadersDistrict = [
 export const finalHeadersLocalCouncil = [
     "Local council",
     "Region",
-    "Overall progress",
     "Overall % Co-Loc",
     "% Deployment (CME & above)",
     "% Deployment (OA & OB)"
@@ -100,17 +98,6 @@ export const sheetDetails = {
 };
 
 export const getPolygonIdKey = (selectedTypeOfKpi) => {
-    // switch (selectedTypeOfKpi) {
-    //     case 'cluster':
-    //         return 'Cluster';
-    //     case 'district':
-    //         return 'District';
-    //     case 'localCouncil':
-    //         return 'Local council';
-    //     default:
-    //         throw new Error('Invalid selectedTypeOfKpi');
-    // }
-
     return {
         'cluster': 'Cluster',
         'district': 'District',
