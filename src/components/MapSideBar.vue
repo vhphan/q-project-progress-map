@@ -175,6 +175,15 @@
       <polygon-labels/>
     </q-expansion-item>
 
+    <q-expansion-item
+        expand-separator
+        icon="label"
+        label="Site Colors"
+        group="some-group"
+        class="my-menu"
+    >
+      <sites-colors/>
+    </q-expansion-item>
 
   </div>
 </template>
@@ -187,12 +196,12 @@ import ExcelFileSelector from "@/components/ExcelFileSelector.vue";
 import {useCosmeticStore} from "@/store/cosmeticStore.js";
 import {useProgressDataStore} from "@/store/progressDataStore.js";
 import CustomColorRange from "@/components/CustomColorRange.vue";
-import PolygonLabeller from "@/components/PolygonLabels.vue";
 import PolygonLabels from "@/components/PolygonLabels.vue";
+import SitesColors from "@/components/SitesColors.vue";
 
 export default {
   name: "MapSideBar",
-  components: {PolygonLabels, PolygonLabeller, CustomColorRange, ExcelFileSelector},
+  components: {SitesColors, PolygonLabels, CustomColorRange, ExcelFileSelector},
   setup() {
     const mapStore = useMapStore();
     const {region, regions} = storeToRefs(mapStore);

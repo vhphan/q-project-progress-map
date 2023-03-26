@@ -390,6 +390,7 @@ export default {
         layer.setStyle({
           ...polygonsStyles.value.hidden,
         });
+        redrawKpiLayer.value = true;
       }
 
       Object.keys(polygonLabels).forEach((key) => {
@@ -404,7 +405,7 @@ export default {
       filterPolygonsByRegion(newValue);
     });
 
-    watch(()=>mapObj.map, (newValue) => {
+    watch(() => mapObj.map, (newValue) => {
       console.log('mapObj.map changed', newValue);
     });
 
@@ -444,8 +445,8 @@ export default {
                 radius: 10,
                 color: '#003cff',
                 fillColor: '#fff',
-                fillOpacity: 1,
-                weight: 1,
+                fillOpacity: 0,
+                weight: 0,
               }).bindTooltip(labelText + kpiText, {
                 permanent: true,
                 direction: 'center',
@@ -479,7 +480,15 @@ export default {
 </script>
 
 <style>
-.polygons-label {
+.polygon-label {
   min-width: 100px;
+  position: absolute;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 4px;
+  border: none;
+  background-color: rgba(256, 256, 256, 0);
+  white-space: nowrap;
+  box-shadow: none !important;
 }
 </style>

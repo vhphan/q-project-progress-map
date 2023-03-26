@@ -32,7 +32,7 @@ export const useMapStore = defineStore('map', {
             regions,
             techLayers: techLayers,
             techLayersAdded: Object.fromEntries(techLayers.map((techLayer) => [techLayer, false])),
-            techLayersColors: [
+            techLayersColors: useStorage('techLayersColors', [
                 '#981ceb',
                 '#7cc992',
                 '#00ff00',
@@ -41,7 +41,7 @@ export const useMapStore = defineStore('map', {
                 '#5f05fa',
                 '#5f5fe5',
                 '#00d2d2',
-            ],
+            ]),
             originalTechLayersColors: [
                 '#981ceb',
                 '#7cc992',
